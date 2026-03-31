@@ -85,10 +85,16 @@ class ComparisonDelta:
 
 class SpeechAnalyzerService:
     def __init__(self):
-        self.model = SentenceTransformer("all-MiniLM-L6-v2")
+        self._model = None
         self.filler_pattern = re.compile(
             r"\b(" + "|".join(FILLER_WORDS) + r")\b", re.IGNORECASE
         )
+
+    @property
+    def model(self):
+        if self._model is None:
+            self._model = SentenceTransformer("all-MiniLM-L6-v2")
+        return self._model
 
     async def analyze(
         self,
