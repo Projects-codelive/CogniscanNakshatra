@@ -77,7 +77,7 @@ function generateSummarySection(riskData, patientName) {
   return {
     status: riskLabel,
     statusColor: riskColor,
-    overallScore: riskData.weightedScore || 70,
+    overallScore: riskData.weightedScore ?? 0,
     confidence: riskData.confidence,
     summary: riskData.riskLevel === 'high' 
       ? `${patientName} shows significant cognitive changes requiring attention.`

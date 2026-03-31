@@ -32,8 +32,17 @@ export function calculateCognitiveTestScore(testResults) {
   };
 
   testResults.forEach((result) => {
-    if (scores.hasOwnProperty(result.testType)) {
-      scores[result.testType] = result.score;
+    const testType = result.testType;
+    if (scores.hasOwnProperty(testType)) {
+      scores[testType] = result.score;
+    } else if (testType === 'clock_drawing') {
+      scores['clock-drawing'] = result.score;
+    } else if (testType === 'word_recall') {
+      scores['word-recall'] = result.score;
+    } else if (testType === 'trail_making') {
+      scores['trail-making'] = result.score;
+    } else if (testType === 'reaction_time') {
+      scores['reaction-time'] = result.score;
     }
   });
 
@@ -71,48 +80,66 @@ export function calculateSpeechAnalysisScore(speechSessions) {
   if (!speechSessions || speechSessions.length === 0) return null;
 
   const recentSessions = speechSessions.slice(-5);
-  const avgFluency = recentSessions.reduce((sum, s) => sum + (s.fluencyScore || 0), 0) / recentSessions.length;
-  const avgComplexity = recentSessions.reduce((sum, s) => sum + (s.complexityScore || 0), 0) / recentSessions.length;
+  const avgFluency = recentSessions.reduce((sum, s) => sum + (s.cognitive_fluency_score || s.fluencyScore || 0), 0) / recentSessions.length;
+  const avgComplexity = recentSessions.reduce((sum, s) => sum + (s.complexityScore || 50), 0) / recentSessions.length;
   
-  return Math.round((avgFluency * 0.6 + avgComplexity * 0.4) * 100);
+  return Math.round(avgFluency);
 }
 
 export function calculateFacialAnalysisScore(facialSessions) {
   if (!facialSessions || facialSessions.length === 0) return null;
 
   const recentSessions = facialSessions.slice(-5);
-  const avgMood = recentSessions.reduce((sum, s) => sum + (s.moodScore || 0), 0) / recentSessions.length;
-  const avgEngagement = recentSessions.reduce((sum, s) => sum + (s.engagementScore || 0), 0) / recentSessions.length;
+  const avgMood = recentSessions.reduce((sum, s) => sum + (s.moodScore || s.mood_score || 0), 0) / recentSessions.length;
+  const avgEngagement = recentSessions.reduce((sum, s) => sum + (s.engagementScore || s.engagement_score || 0), 0) / recentSessions.length;
   
-  return Math.round((avgMood * 0.5 + avgEngagement * 0.5) * 100);
+  return Math.round(avgMood);
 }
 
 export function calculateCheckInScore(checkIns) {
   if (!checkIns || checkIns.length === 0) return null;
 
   const recentCheckIns = checkIns.slice(-7);
-  const completionRate = recentCheckIns.filter((c) => c.completed).length / recentCheckIns.length;
+  const completionRate = recentCheckIns.length > 0 ? recentCheckIns.length / 7 : 0;
   
   const avgMood = recentCheckIns.reduce((sum, c) => sum + (c.mood || 3), 0) / recentCheckIns.length;
-  const avgEnergy = recentCheckIns.reduce((sum, c) => sum + (c.energy || 3), 0) / recentCheckIns.length;
+  const avgSleep = recentCheckIns.reduce((sum, c) => sum + (c.sleep || 3), 0) / recentCheckIns.length;
   
   const moodScore = (avgMood / 5) * 100;
-  const energyScore = (avgEnergy / 5) * 100;
+  const sleepScore = (avgSleep / 5) * 100;
   const completionScore = completionRate * 100;
   
-  return Math.round((moodScore * 0.4 + energyScore * 0.3 + completionScore * 0.3));
+  return Math.round((moodScore * 0.5 + sleepScore * 0.3 + completionScore * 0.2));
 }
 
-export function calculateMedicationScore(medicationLogs) {
-  if (!medicationLogs || medicationLogs.length === 0) return null;
+export function calculateMedicationScore(medications) {
+  if (!medications || medications.length === 0) return null;
 
-  const recentLogs = medicationLogs.slice(-14);
-  const taken = recentLogs.filter((l) => l.status === 'taken' || l.status === 'skipped_verified').length;
-  const total = recentLogs.length;
+  const today = new Date();
+  const last7Days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    last7Days.push(d.toISOString().split('T')[0]);
+  }
+
+  let totalDoses = 0;
+  let takenDoses = 0;
+
+  medications.forEach(med => {
+    const freq = med.frequency || 1;
+    totalDoses += last7Days.length * freq;
+    last7Days.forEach(day => {
+      const dayTaken = med.taken?.find(t => t.date === day);
+      if (dayTaken?.taken) {
+        takenDoses += 1;
+      }
+    });
+  });
+
+  if (totalDoses === 0) return null;
   
-  if (total === 0) return null;
-  
-  return Math.round((taken / total) * 100);
+  return Math.round((takenDoses / totalDoses) * 100);
 }
 
 export function calculateOverallCogniScore(componentScores) {

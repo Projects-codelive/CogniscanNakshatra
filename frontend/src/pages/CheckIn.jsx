@@ -35,6 +35,15 @@ export default function CheckIn() {
     loadPreviousCheckIn();
   }, [loadPreviousCheckIn]);
 
+  useEffect(() => {
+    const handleFocus = () => {
+      loadPreviousCheckIn();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [loadPreviousCheckIn]);
+
   const calculateStreak = async () => {
     const checkIns = await getCheckIns(30);
     if (checkIns.length === 0) return { current: 0, message: '' };

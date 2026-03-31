@@ -219,7 +219,7 @@ export default function Insights() {
               </p>
             </div>
             <div className="text-right">
-              <p className="text-4xl lg:text-5xl font-bold text-white">{riskData?.weightedScore || cogniScore}</p>
+              <p className="text-4xl lg:text-5xl font-bold text-white">{riskData?.weightedScore ?? (cogniScore > 0 ? cogniScore : 0)}</p>
               <p className="text-xs text-slate-500">{t('insights.of100')}</p>
             </div>
           </div>

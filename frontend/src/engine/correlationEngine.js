@@ -1,6 +1,6 @@
 import { db } from '../store/db';
 
-export async function analyzeCorrelations(patientId = 1) {
+export async function analyzeCorrelations(patientId = 'default') {
   const now = new Date();
   const monthAgo = new Date(now);
   monthAgo.setDate(monthAgo.getDate() - 30);

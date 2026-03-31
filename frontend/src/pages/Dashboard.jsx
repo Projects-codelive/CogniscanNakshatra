@@ -39,7 +39,7 @@ const Dashboard = () => {
   const { isOnline, isOfflineMode, getQueueStats } = useSyncStore();
   const patientName = user?.name || user?.email?.split('@')[0] || 'User';
   
-  const [cogniScore, setCogniScore] = useState(storeScore || 75);
+  const [cogniScore, setCogniScore] = useState(0);
   const [scoreBreakdown, setScoreBreakdown] = useState(null);
   const [recentActivities, setRecentActivities] = useState([]);
   const [weeklyData, setWeeklyData] = useState([]);
@@ -100,7 +100,7 @@ const Dashboard = () => {
 
   const loadDashboardData = useCallback(async () => {
     try {
-      const patientId = 1;
+      const patientId = 'default';
       
       const [checkIns, testResults, speechSessions, facialSessions, medicationLogs, risk, weekly, insight] = await Promise.all([
         db.checkIns.where('patientId').equals(patientId).reverse().limit(30).toArray(),
@@ -124,7 +124,7 @@ const Dashboard = () => {
         medicationLogs,
       });
 
-      const effectiveScore = risk?.weightedScore || scores.overall || storeScore || 75;
+      const effectiveScore = scores.overall !== null ? (risk?.weightedScore || scores.overall) : 0;
       setCogniScore(effectiveScore);
       setScoreBreakdown(scores.breakdown);
 
@@ -239,6 +239,15 @@ const Dashboard = () => {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadDashboardData();
+  }, [loadDashboardData]);
+
+  useEffect(() => {
+    const handleFocus = () => {
+      loadDashboardData();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
   }, [loadDashboardData]);
 
   const quickActions = [

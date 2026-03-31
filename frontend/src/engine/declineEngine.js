@@ -13,7 +13,7 @@ const RISK_WEIGHTS = {
   behavior: 0.25,
 };
 
-export async function calculateBaseline(patientId = 1) {
+export async function calculateBaseline(patientId = 'default') {
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - BASELINE_DAYS);
 
@@ -96,7 +96,7 @@ export async function calculateBaseline(patientId = 1) {
   return baseline;
 }
 
-export async function calculateTrends(patientId = 1, baseline) {
+export async function calculateTrends(patientId = 'default', baseline) {
   const now = new Date();
   const weekAgo = new Date(now);
   weekAgo.setDate(weekAgo.getDate() - 7);
@@ -288,7 +288,7 @@ export function detectDeclineFlags(trends) {
   });
 }
 
-export async function calculateRiskScore(patientId = 1) {
+export async function calculateRiskScore(patientId = 'default') {
   const baseline = await calculateBaseline(patientId);
   
   if (baseline.count < 3) {
@@ -369,7 +369,7 @@ export async function calculateRiskScore(patientId = 1) {
   };
 }
 
-export async function getDeclineReport(patientId = 1) {
+export async function getDeclineReport(patientId = 'default') {
   const riskData = await calculateRiskScore(patientId);
   
   return {
@@ -439,7 +439,7 @@ function generateRecommendations(flags) {
   return recs;
 }
 
-export async function getWeeklySummary(patientId = 1) {
+export async function getWeeklySummary(patientId = 'default') {
   const now = new Date();
   const weekAgo = new Date(now);
   weekAgo.setDate(weekAgo.getDate() - 7);

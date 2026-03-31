@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 # MongoDB connection string - default to local if not provided
-MONGODB_URL = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
+MONGODB_URL = os.getenv("MONGODB_URL", "mongodb+srv://sg25042023_db_user:Shyam123x@networkingcluster.ceej1sg.mongodb.net/cognisense?appName=networkingCluster")
 DATABASE_NAME = "cogniscan"
 
 class Database:

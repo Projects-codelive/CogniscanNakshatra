@@ -85,6 +85,15 @@ export default function TestsPage() {
     loadTestResults();
   }, []);
 
+  useEffect(() => {
+    const handleFocus = () => {
+      loadTestResults();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
+
   const loadTestResults = async () => {
     try {
       const results = await repository.testResults.getByPatientId('default');

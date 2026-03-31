@@ -73,6 +73,15 @@ export default function Medications() {
     loadMedications();
   }, [loadMedications]);
 
+  useEffect(() => {
+    const handleFocus = () => {
+      loadMedications();
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [loadMedications]);
+
   const stats = getAdherenceStats(meds);
 
   const handleFrequencySelect = (freq) => {

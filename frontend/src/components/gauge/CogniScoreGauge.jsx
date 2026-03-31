@@ -114,7 +114,7 @@ export default function CogniScoreGauge({ score = 0, size = 200, strokeWidth = 1
           className="text-4xl md:text-5xl font-bold transition-colors duration-500"
           style={{ color: colors.main }}
         >
-          {Math.round(animatedScore)}
+          {animatedScore === 0 ? '--' : Math.round(animatedScore)}
         </span>
         <span className="text-slate-400 text-xs md:text-sm mt-1">CogniScore</span>
         {showLabel && (
@@ -125,7 +125,7 @@ export default function CogniScoreGauge({ score = 0, size = 200, strokeWidth = 1
               backgroundColor: `${colors.main}20` 
             }}
           >
-            {getScoreLabel(animatedScore)}
+            {animatedScore === 0 ? 'Get Started' : getScoreLabel(animatedScore)}
           </span>
         )}
       </div>

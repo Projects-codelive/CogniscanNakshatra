@@ -72,7 +72,7 @@ const INTERVENTIONS = {
   },
 };
 
-export async function generateInterventions(patientId = 1) {
+export async function generateInterventions(patientId = 'default') {
   const riskData = await calculateRiskScore(patientId);
   const interventions = [];
 
@@ -138,7 +138,7 @@ export function getInterventionForDomain(domain, severity = 'mild') {
   };
 }
 
-export async function generateAIRecommendation(patientId = 1) {
+export async function generateAIRecommendation(patientId = 'default') {
   const riskData = await calculateRiskScore(patientId);
   const weeklySummary = await getWeeklySummary(patientId);
   const correlations = await analyzeCorrelations(patientId);
@@ -220,7 +220,7 @@ export async function generateAIRecommendation(patientId = 1) {
   };
 }
 
-export async function generateCaregiverInsight(patientId = 1, patientName = 'Patient') {
+export async function generateCaregiverInsight(patientId = 'default', patientName = 'Patient') {
   const riskData = await calculateRiskScore(patientId);
   const weeklySummary = await getWeeklySummary(patientId);
   const correlations = await analyzeCorrelations(patientId);
