@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { Download, ZoomIn, ZoomOut, RotateCcw, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Sidebar from '../components/Sidebar';
 
 const layers = [
@@ -85,6 +86,7 @@ const connections = [
 ];
 
 export default function ArchitecturePage() {
+  const { t } = useTranslation();
   const [selectedLayer, setSelectedLayer] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -149,15 +151,15 @@ export default function ArchitecturePage() {
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-white">System Architecture</h1>
-                <p className="text-slate-400 mt-1">Nakshatra Cognitive Assessment Platform</p>
+                <h1 className="text-2xl md:text-3xl font-bold text-white">{t('architecture.title')}</h1>
+                <p className="text-slate-400 mt-1">{t('architecture.subtitle')}</p>
               </div>
               
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleZoomOut}
                   className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors"
-                  title="Zoom Out"
+                  title={t('architecture.zoomOut')}
                 >
                   <ZoomOut size={20} />
                 </button>
@@ -165,14 +167,14 @@ export default function ArchitecturePage() {
                 <button
                   onClick={handleZoomIn}
                   className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors"
-                  title="Zoom In"
+                  title={t('architecture.zoomIn')}
                 >
                   <ZoomIn size={20} />
                 </button>
                 <button
                   onClick={handleReset}
                   className="p-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors"
-                  title="Reset View"
+                  title={t('architecture.resetView')}
                 >
                   <RotateCcw size={20} />
                 </button>
@@ -181,7 +183,7 @@ export default function ArchitecturePage() {
                   className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 text-white hover:bg-violet-700 transition-colors"
                 >
                   <Download size={18} />
-                  <span className="hidden sm:inline">Download PNG</span>
+                  <span className="hidden sm:inline">{t('architecture.downloadPng')}</span>
                 </button>
               </div>
             </div>
@@ -189,7 +191,7 @@ export default function ArchitecturePage() {
             <div className="bg-slate-800/50 rounded-xl border border-slate-700 overflow-hidden">
               <div className="p-4 border-b border-slate-700 flex items-center gap-2">
                 <Info size={18} className="text-slate-400" />
-                <span className="text-slate-400 text-sm">Click on a layer to see details. Drag to pan.</span>
+                <span className="text-slate-400 text-sm">{t('architecture.clickToSeeDetails')}</span>
               </div>
               
               <div 

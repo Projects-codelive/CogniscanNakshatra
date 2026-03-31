@@ -1,16 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Moon, Smile, CloudFog, Check, TrendingUp, TrendingDown, Minus, Flame, Lightbulb } from 'lucide-react';
-import { db, addCheckIn, getCheckIns } from '../store/db';
+import { addCheckIn, getCheckIns } from '../store/db';
 import { useAppStore } from '../store/useAppStore';
 
-const scales = [
-  { key: 'sleep', label: 'How did you sleep?', icon: Moon, low: 'Poorly', high: 'Great' },
-  { key: 'mood', label: 'How is your mood?', icon: Smile, low: 'Low', high: 'Happy' },
-  { key: 'confusion', label: 'Any confusion today?', icon: CloudFog, low: 'A lot', high: 'None' },
-];
-
 export default function CheckIn() {
+  const { t } = useTranslation();
   const [values, setValues] = useState({ sleep: 3, mood: 3, confusion: 3 });
   const [saved, setSaved] = useState(false);
   const [wellbeingScore, setWellbeingScore] = useState(0);
@@ -21,23 +17,29 @@ export default function CheckIn() {
   const navigate = useNavigate();
   const { setStreak } = useAppStore();
 
-  useEffect(() => {
-    loadPreviousCheckIn();
-  }, []);
+  const scales = [
+    { key: 'sleep', label: t('checkin.sleepDesc'), icon: Moon, low: t('checkin.sleep'), high: t('checkin.energy') },
+    { key: 'mood', label: t('checkin.mood'), icon: Smile, low: t('checkin.mood'), high: t('checkin.energy') },
+    { key: 'confusion', label: t('checkin.energy'), icon: CloudFog, low: t('checkin.sleep'), high: t('checkin.mood') },
+  ];
 
-  const loadPreviousCheckIn = async () => {
+  const loadPreviousCheckIn = useCallback(async () => {
     const checkIns = await getCheckIns(1);
     if (checkIns.length > 0) {
       setPreviousScore(checkIns[0].wellbeingScore);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadPreviousCheckIn();
+  }, [loadPreviousCheckIn]);
 
   const calculateStreak = async () => {
     const checkIns = await getCheckIns(30);
     if (checkIns.length === 0) return { current: 0, message: '' };
 
     let streak = 0;
-    const today = new Date().toISOString().split('T')[0];
     const dates = checkIns.map(c => c.date.split('T')[0]);
 
     for (let i = 0; i < 30; i++) {
@@ -54,7 +56,7 @@ export default function CheckIn() {
 
     return {
       current: streak,
-      message: streak > 1 ? `${streak}-day check-in streak! Keep it up!` : 'Start your streak today!',
+      message: streak > 1 ? `${streak} ${t('dashboard.streak')}!` : t('checkin.takeCare'),
     };
   };
 
@@ -83,13 +85,13 @@ export default function CheckIn() {
     setStreak(streakData.current);
 
     if (values.sleep <= 2) {
-      setMicroInsight('Lower sleep may be affecting your cognition. Try to get more rest tonight.');
+      setMicroInsight(t('checkin.savedSuccess'));
     } else if (values.mood <= 2) {
-      setMicroInsight('Low mood can impact cognitive performance. Consider activities that bring you joy.');
+      setMicroInsight(t('checkin.greatDay'));
     } else if (values.confusion >= 4) {
-      setMicroInsight('Higher confusion reported. Stay hydrated and ensure good nutrition.');
+      setMicroInsight(t('checkin.takeCare'));
     } else {
-      setMicroInsight('You are reporting well. Keep up your healthy habits!');
+      setMicroInsight(t('checkin.greatDay'));
     }
 
     setSaved(true);
@@ -99,17 +101,17 @@ export default function CheckIn() {
     return (
       <div className="min-h-screen bg-slate-950 pb-8">
         <div className="bg-slate-900 p-5 lg:p-6 border-b border-slate-800">
-          <h1 className="text-lg lg:text-xl font-bold text-white">Check-in Saved!</h1>
+          <h1 className="text-lg lg:text-xl font-bold text-white">{t('checkin.savedSuccess')}</h1>
         </div>
         <div className="p-4 lg:p-6 flex flex-col items-center justify-center">
           <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4">
             <Check className="w-8 h-8 lg:w-10 lg:h-10 text-emerald-500" />
           </div>
-          <p className="text-lg lg:text-xl font-bold text-white">Check-in saved!</p>
+          <p className="text-lg lg:text-xl font-bold text-white">{t('checkin.savedSuccess')}</p>
 
           <div className="mt-6 w-full max-w-md space-y-4">
             <div className="bg-slate-900 rounded-2xl p-5 border border-slate-800 text-center">
-              <p className="text-sm text-slate-400">Today's Wellbeing Score</p>
+              <p className="text-sm text-slate-400">{t('checkin.title')}</p>
               <p className="text-3xl lg:text-4xl font-bold text-white mt-1">{wellbeingScore}%</p>
               {trend && (
                 <div className={`flex items-center justify-center gap-1 mt-2 text-sm ${
@@ -120,8 +122,8 @@ export default function CheckIn() {
                   {trend.changeType === 'stable' && <Minus className="w-4 h-4" />}
                   <span>
                     {trend.changeType === 'stable'
-                      ? 'No change from yesterday'
-                      : `${trend.changeType === 'increase' ? 'Up' : 'Down'} ${Math.abs(trend.change)}% from yesterday`}
+                      ? t('insights.stable')
+                      : `${trend.changeType === 'increase' ? t('insights.improvement') : t('insights.decline')} ${Math.abs(trend.change)}%`}
                   </span>
                 </div>
               )}
@@ -146,7 +148,7 @@ export default function CheckIn() {
             onClick={() => navigate('/')}
             className="mt-6 px-6 lg:px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition-all"
           >
-            Back Home
+            {t('dashboard.title')}
           </button>
         </div>
       </div>
@@ -156,8 +158,8 @@ export default function CheckIn() {
   return (
     <div className="min-h-screen bg-slate-950 pb-8">
       <div className="bg-slate-900 p-5 lg:p-6 border-b border-slate-800">
-        <h1 className="text-lg lg:text-xl font-bold text-white">Daily Check-in</h1>
-        <p className="text-slate-400 text-sm mt-1">How are you feeling today?</p>
+        <h1 className="text-lg lg:text-xl font-bold text-white">{t('checkin.title')}</h1>
+        <p className="text-slate-400 text-sm mt-1">{t('checkin.subtitle')}</p>
       </div>
 
       <div className="p-4 lg:p-6 space-y-4 lg:space-y-6 max-w-3xl mx-auto">
@@ -186,8 +188,8 @@ export default function CheckIn() {
                 ))}
               </div>
               <div className="flex justify-between mt-2">
-                <span className="text-[10px] text-slate-500">{s.low}</span>
-                <span className="text-[10px] text-slate-500">{s.high}</span>
+                <span className="text-[10px] text-slate-500">{t('common.none')}</span>
+                <span className="text-[10px] text-slate-500">{t('common.all')}</span>
               </div>
             </div>
           ))}
@@ -196,7 +198,7 @@ export default function CheckIn() {
           onClick={handleSave}
           className="w-full h-12 lg:h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-base lg:text-lg font-semibold transition-all"
         >
-          Save Check-in
+          {t('checkin.save')}
         </button>
       </div>
     </div>

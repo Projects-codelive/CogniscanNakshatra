@@ -23,6 +23,7 @@ import {
   SkipForward,
   Speaker
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store/useAppStore';
 import axios from 'axios';
 
@@ -73,6 +74,7 @@ const CATEGORY_LABELS = {
 const FILLER_WORDS = ['um', 'uh', 'like', 'you know', 'basically', 'er', 'ah'];
 
 const FacialSession = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [sessionPhase, setSessionPhase] = useState('idle');
   const [videoElement, setVideoElement] = useState(null);
@@ -171,8 +173,8 @@ const FacialSession = () => {
     } catch (err) {
       console.error('Camera access error:', err);
       setCameraError({
-        title: 'Camera Access Required',
-        message: 'Please allow camera access to use this feature. Check your browser settings and try again.'
+        title: t('facial.cameraError.title'),
+        message: t('facial.cameraError.message')
       });
     }
   }, []);
@@ -695,13 +697,13 @@ const FacialSession = () => {
     setShowProcessing(true);
     
     const stages = [
-      { name: 'Analyzing facial expressions...', progress: 15 },
-      { name: 'Transcribing verbal responses...', progress: 30 },
-      { name: 'Computing response latencies...', progress: 45 },
-      { name: 'Mapping emotional congruence...', progress: 60 },
-      { name: 'Calculating domain scores...', progress: 75 },
-      { name: 'Generating risk assessment...', progress: 90 },
-      { name: 'Composing report...', progress: 100 }
+      { name: t('facial.analyzingFacial'), progress: 15 },
+      { name: t('facial.transcribingResponses'), progress: 30 },
+      { name: t('facial.computingLatencies'), progress: 45 },
+      { name: t('facial.mappingCongruence'), progress: 60 },
+      { name: t('facial.calculatingScores'), progress: 75 },
+      { name: t('facial.generatingRisk'), progress: 90 },
+      { name: t('facial.composingReport'), progress: 100 }
     ];
     
     for (const stage of stages) {
@@ -875,7 +877,7 @@ const FacialSession = () => {
           <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 max-w-md w-full mx-4">
             <div className="flex flex-col items-center">
               <Loader2 size={48} className="text-blue-500 animate-spin mb-6" />
-              <h2 className="text-xl font-bold text-white mb-2">Generating Report</h2>
+              <h2 className="text-xl font-bold text-white mb-2">{t('facial.generatingReport')}</h2>
               <p className="text-sm text-slate-400 mb-6">{processingStage}</p>
               <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden mb-4">
                 <div 
@@ -883,7 +885,7 @@ const FacialSession = () => {
                   style={{ width: `${processingProgress}%` }}
                 />
               </div>
-              <p className="text-xs text-slate-500">Please wait...</p>
+              <p className="text-xs text-slate-500">{t('facial.pleaseWait')}</p>
             </div>
           </div>
         </div>
@@ -892,22 +894,22 @@ const FacialSession = () => {
       {showEndConfirm && (
         <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center">
           <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold text-white mb-2">End Session?</h3>
+            <h3 className="text-lg font-bold text-white mb-2">{t('facial.endSession')}</h3>
             <p className="text-sm text-slate-400 mb-6">
-              Your progress will be saved and a partial report will be generated.
+              {t('facial.progressWillSaved')}
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowEndConfirm(false)}
                 className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm font-bold transition-all"
               >
-                Continue Session
+                {t('facial.continueSession')}
               </button>
               <button
                 onClick={handleEndSession}
                 className="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl text-sm font-bold transition-all"
               >
-                End Session
+                {t('facial.end')}
               </button>
             </div>
           </div>
@@ -937,15 +939,15 @@ const FacialSession = () => {
                 {sessionPhase === 'idle' && !cameraError && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/80">
                     <Camera size={64} className="text-blue-500 mb-6" />
-                    <h2 className="text-xl font-bold text-white mb-2">Facial Analysis Session</h2>
+                    <h2 className="text-xl font-bold text-white mb-2">{t('facial.facialAnalysisSession')}</h2>
                     <p className="text-sm text-slate-400 mb-6 text-center max-w-md">
-                      This assessment will analyze your facial expressions while you answer questions.
+                      {t('facial.analyzeExpressions')}
                     </p>
                     <button
                       onClick={startCamera}
                       className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-blue-900/30"
                     >
-                      Start Camera
+                      {t('facial.startCamera')}
                     </button>
                   </div>
                 )}
@@ -959,7 +961,7 @@ const FacialSession = () => {
                       onClick={startCamera}
                       className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-bold"
                     >
-                      Try Again
+                      {t('facial.tryAgain')}
                     </button>
                   </div>
                 )}
@@ -974,9 +976,9 @@ const FacialSession = () => {
                       </svg>
                       <Eye size={48} className="text-blue-500/50" />
                     </div>
-                    <h3 className="text-lg font-bold text-white mb-2">Calibrating...</h3>
+                    <h3 className="text-lg font-bold text-white mb-2">{t('facial.calibrating')}</h3>
                     <p className="text-sm text-slate-400 mb-4 text-center max-w-sm">
-                      Look straight at the camera and relax your face.
+                      {t('facial.lookStraightCamera')}
                     </p>
                     <div className="w-64 h-2 bg-slate-700 rounded-full overflow-hidden mb-2">
                       <div 
@@ -994,7 +996,7 @@ const FacialSession = () => {
                           <div className="w-4 h-4 rounded-full border-2 border-slate-600" />
                         )}
                         <span className={`text-xs ${calibrationSteps.position ? 'text-emerald-400' : 'text-slate-500'}`}>
-                          Detecting face position...
+                          {t('facial.detectingFace')}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -1004,7 +1006,7 @@ const FacialSession = () => {
                           <div className="w-4 h-4 rounded-full border-2 border-slate-600" />
                         )}
                         <span className={`text-xs ${calibrationSteps.expression ? 'text-emerald-400' : 'text-slate-500'}`}>
-                          Measuring expression baseline...
+                          {t('facial.measuringExpression')}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -1014,7 +1016,7 @@ const FacialSession = () => {
                           <div className="w-4 h-4 rounded-full border-2 border-slate-600" />
                         )}
                         <span className={`text-xs ${calibrationSteps.blink ? 'text-emerald-400' : 'text-slate-500'}`}>
-                          Calculating blink rate...
+                          {t('facial.calculatingBlink')}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -1024,7 +1026,7 @@ const FacialSession = () => {
                           <div className="w-4 h-4 rounded-full border-2 border-slate-600" />
                         )}
                         <span className={`text-xs ${calibrationSteps.complete ? 'text-emerald-400' : 'text-slate-500'}`}>
-                          Baseline established
+                          {t('facial.baselineEstablished')}
                         </span>
                       </div>
                     </div>
@@ -1035,8 +1037,8 @@ const FacialSession = () => {
                   <div className="absolute inset-0 flex items-center justify-center bg-slate-900/70 backdrop-blur-sm">
                     <div className="text-center">
                       <CheckCircle2 size={48} className="text-emerald-500 mx-auto mb-4" />
-                      <h3 className="text-lg font-bold text-white mb-2">Calibration Complete</h3>
-                      <p className="text-sm text-slate-400">Starting session...</p>
+                      <h3 className="text-lg font-bold text-white mb-2">{t('facial.calibrationComplete')}</h3>
+                      <p className="text-sm text-slate-400">{t('facial.startingSession')}</p>
                     </div>
                   </div>
                 )}
@@ -1045,7 +1047,7 @@ const FacialSession = () => {
                   <>
                     <div className="absolute top-4 left-4 flex items-center gap-2 bg-red-500/20 px-3 py-1.5 rounded-full">
                       <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                      <span className="text-xs font-bold text-red-400">Recording</span>
+                      <span className="text-xs font-bold text-red-400">{t('facial.recording')}</span>
                     </div>
 
                     <div className="absolute top-4 right-4 flex items-center gap-2">
@@ -1054,7 +1056,7 @@ const FacialSession = () => {
                         className="p-2 bg-red-600/80 hover:bg-red-600 text-white rounded-lg transition-all flex items-center gap-2"
                       >
                         <StopCircle size={18} />
-                        <span className="text-xs font-bold hidden sm:inline">End</span>
+                        <span className="text-xs font-bold hidden sm:inline">{t('facial.end')}</span>
                       </button>
                     </div>
 
@@ -1067,7 +1069,7 @@ const FacialSession = () => {
                     </div>
 
                     <div className="absolute bottom-4 right-4 bg-slate-900/80 backdrop-blur-sm px-3 py-2 rounded-lg">
-                      <span className="text-xs text-slate-400">Frames: </span>
+                      <span className="text-xs text-slate-400">{t('facial.frames')}: </span>
                       <span className="text-xs font-bold text-white">{frameCount}</span>
                     </div>
 
@@ -1093,7 +1095,7 @@ const FacialSession = () => {
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      Question {currentQuestionIndex + 1} of {questions.length}
+                      {t('facial.questionOf', { current: currentQuestionIndex + 1, total: questions.length })}
                     </span>
                     <span className={`text-2xl font-black tabular-nums ${getTimerColor()}`}>
                       {formatTime(responseTimer)}
@@ -1121,29 +1123,29 @@ const FacialSession = () => {
                   {isSpeaking ? (
                     <>
                       <Speaker size={16} className="text-blue-400 animate-pulse" />
-                      <span className="text-xs">Reading question...</span>
+                      <span className="text-xs">{t('facial.readingQuestion')}</span>
                     </>
                   ) : (
                     <>
                       <MessageSquare size={16} />
-                      <span className="text-xs">Your turn to answer</span>
+                      <span className="text-xs">{t('facial.yourTurnAnswer')}</span>
                     </>
                   )}
                 </div>
 
                 <div className="bg-slate-800/30 p-4 rounded-xl border border-slate-700/30 min-h-[100px]">
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">
-                    Detected speech:
+                    {t('facial.detectedSpeech')}
                   </p>
                   <p className="text-sm text-slate-400 italic leading-relaxed">
                     {(transcript + ' ' + interimTranscript).trim() || (
-                      <span className="text-slate-600">Speak to see your words appear here...</span>
+                      <span className="text-slate-600">{t('facial.speakToSee')}</span>
                     )}
                   </p>
                 </div>
 
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Filler words:</span>
+                  <span className="text-slate-500">{t('facial.fillerWordsLabel')}</span>
                   <span className="font-bold text-yellow-400">{fillerCount}</span>
                 </div>
 
@@ -1153,7 +1155,7 @@ const FacialSession = () => {
                     className="py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2"
                   >
                     <SkipForward size={16} />
-                    Skip
+                    {t('facial.skip')}
                   </button>
                   <button
                     onClick={handleNextQuestion}
@@ -1165,12 +1167,12 @@ const FacialSession = () => {
                   >
                     {currentQuestionIndex === questions.length - 1 ? (
                       <>
-                        Generate Report
+                        {t('facial.generateReport')}
                         <CheckCircle2 size={16} />
                       </>
                     ) : (
                       <>
-                        Next Question
+                        {t('facial.nextQuestion')}
                         <ChevronRight size={16} />
                       </>
                     )}
@@ -1183,22 +1185,22 @@ const FacialSession = () => {
               <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6">
                 <div className="flex flex-col items-center justify-center py-8">
                   <Loader2 size={32} className="text-blue-500 animate-spin mb-4" />
-                  <p className="text-sm text-slate-400">Processing your response...</p>
+                  <p className="text-sm text-slate-400">{t('facial.processingResponse')}</p>
                 </div>
               </div>
             )}
 
             {(sessionPhase === 'idle' || sessionPhase === 'ready') && (
               <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6">
-                <h3 className="text-sm font-bold text-white mb-4">Session Overview</h3>
+                <h3 className="text-sm font-bold text-white mb-4">{t('facial.sessionOverview')}</h3>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center">
                       <Brain size={16} className="text-blue-500" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-white">6 Questions</p>
-                      <p className="text-xs text-slate-500">Various cognitive domains</p>
+                      <p className="text-sm font-bold text-white">{questions.length} {t('facial.questions')}</p>
+                      <p className="text-xs text-slate-500">{t('facial.variousDomains')}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -1206,8 +1208,8 @@ const FacialSession = () => {
                       <Camera size={16} className="text-emerald-500" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-white">Facial Analysis</p>
-                      <p className="text-xs text-slate-500">Real-time tracking</p>
+                      <p className="text-sm font-bold text-white">{t('facial.facialAnalysis')}</p>
+                      <p className="text-xs text-slate-500">{t('facial.realTimeTracking')}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -1215,8 +1217,8 @@ const FacialSession = () => {
                       <Activity size={16} className="text-purple-500" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-white">Full Report</p>
-                      <p className="text-xs text-slate-500">Comprehensive analysis</p>
+                      <p className="text-sm font-bold text-white">{t('facial.fullReport')}</p>
+                      <p className="text-xs text-slate-500">{t('facial.comprehensiveAnalysis')}</p>
                     </div>
                   </div>
                 </div>
@@ -1225,11 +1227,11 @@ const FacialSession = () => {
 
             {sessionPhase === 'calibration' && (
               <div className="bg-slate-900 rounded-3xl border border-slate-800 p-6">
-                <h3 className="text-sm font-bold text-white mb-4">Live Metrics</h3>
+                <h3 className="text-sm font-bold text-white mb-4">{t('facial.liveMetrics')}</h3>
                 <div className="space-y-4">
                   <div>
                     <div className="flex justify-between text-xs mb-1">
-                      <span className="text-slate-500">Engagement</span>
+                      <span className="text-slate-500">{t('facial.engagement')}</span>
                       <span className="text-emerald-400">{Math.round(realTimeMetrics.engagement)}%</span>
                     </div>
                     <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
@@ -1238,7 +1240,7 @@ const FacialSession = () => {
                   </div>
                   <div>
                     <div className="flex justify-between text-xs mb-1">
-                      <span className="text-slate-500">Attention</span>
+                      <span className="text-slate-500">{t('facial.attention')}</span>
                       <span className="text-blue-400">{Math.round(realTimeMetrics.attention)}%</span>
                     </div>
                     <div className="h-2 bg-slate-700 rounded-full overflow-hidden">

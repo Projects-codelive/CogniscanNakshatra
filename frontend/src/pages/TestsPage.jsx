@@ -14,60 +14,61 @@ import { useAppStore } from '../store/useAppStore';
 import { repository } from '../db/database';
 import { useState, useEffect } from 'react';
 import useAuthStore from '../store/useAuthStore';
+import { useTranslation } from 'react-i18next';
 
 const tests = [
   {
     id: 'clock_drawing',
-    name: 'Clock Drawing Test',
-    description: 'Draw a clock with hands showing a specific time',
+    nameKey: 'tests.clockDrawing.title',
+    descriptionKey: 'tests.clockDrawing.description',
     icon: Clock,
-    category: 'Cognitive — Visuospatial',
-    duration: '3-5 min',
-    difficulty: 'Medium',
+    categoryKey: 'testsPage.category.visuospatial',
+    durationKey: 'common.3to5min',
+    difficultyKey: 'testsPage.difficulty.medium',
     color: 'from-blue-500 to-indigo-600',
     path: '/tests/clock-drawing',
   },
   {
     id: 'word_recall',
-    name: 'Word Recall Test',
-    description: 'Memorize and recall a list of words',
+    nameKey: 'tests.wordRecall.title',
+    descriptionKey: 'tests.wordRecall.description',
     icon: Brain,
-    category: 'Cognitive — Memory',
-    duration: '3-4 min',
-    difficulty: 'Medium',
+    categoryKey: 'testsPage.category.memory',
+    durationKey: 'common.3to4min',
+    difficultyKey: 'testsPage.difficulty.medium',
     color: 'from-purple-500 to-pink-600',
     path: '/tests/word-recall',
   },
   {
     id: 'trail_making',
-    name: 'Trail Making Test',
-    description: 'Connect numbered circles in sequence',
+    nameKey: 'tests.trailMaking.title',
+    descriptionKey: 'tests.trailMaking.description',
     icon: Grid3X3,
-    category: 'Cognitive — Executive',
-    duration: '2-3 min',
-    difficulty: 'Easy',
+    categoryKey: 'testsPage.category.executive',
+    durationKey: 'common.2to3min',
+    difficultyKey: 'testsPage.difficulty.easy',
     color: 'from-emerald-500 to-teal-600',
     path: '/tests/trail-making',
   },
   {
     id: 'stroop',
-    name: 'Stroop Test',
-    description: 'Identify ink colors while reading words',
+    nameKey: 'tests.stroop.title',
+    descriptionKey: 'tests.stroop.description',
     icon: Timer,
-    category: 'Cognitive — Attention',
-    duration: '2-3 min',
-    difficulty: 'Medium',
+    categoryKey: 'testsPage.category.attention',
+    durationKey: 'common.2to3min',
+    difficultyKey: 'testsPage.difficulty.medium',
     color: 'from-orange-500 to-red-600',
     path: '/tests/stroop',
   },
   {
     id: 'reaction_time',
-    name: 'Reaction Time Test',
-    description: 'Tap as fast as possible when the box turns green',
+    nameKey: 'tests.reactionTime.title',
+    descriptionKey: 'tests.reactionTime.description',
     icon: Zap,
-    category: 'Cognitive — Processing',
-    duration: '1-2 min',
-    difficulty: 'Easy',
+    categoryKey: 'testsPage.category.processing',
+    durationKey: 'common.1to2min',
+    difficultyKey: 'testsPage.difficulty.easy',
     color: 'from-yellow-500 to-amber-600',
     path: '/tests/reaction-time',
   },
@@ -75,6 +76,7 @@ const tests = [
 
 export default function TestsPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const [testResults, setTestResults] = useState({});
   const [loading, setLoading] = useState(true);
@@ -109,20 +111,19 @@ export default function TestsPage() {
     const diff = Date.now() - new Date(timestamp).getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(hours / 24);
-    if (days > 0) return `${days}d ago`;
-    if (hours > 0) return `${hours}h ago`;
-    return 'Just now';
+    if (days > 0) return `${days}d ${t('common.ago')}`;
+    if (hours > 0) return `${hours}h ${t('common.ago')}`;
+    return t('common.justNow');
   };
 
   return (
     <div className="min-h-screen bg-slate-950 pb-8">
       <div className="bg-slate-900 p-5 lg:p-6 border-b border-slate-800">
-        <h1 className="text-xl lg:text-2xl font-bold text-white">Cognitive Tests</h1>
-        <p className="text-slate-400 text-sm mt-1">Track your cognitive performance</p>
+        <h1 className="text-xl lg:text-2xl font-bold text-white">{t('testsPage.title')}</h1>
+        <p className="text-slate-400 text-sm mt-1">{t('testsPage.subtitle')}</p>
       </div>
 
       <div className="p-4 lg:p-6 space-y-4 max-w-4xl mx-auto">
-        {/* Test Selection Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {tests.map((test) => {
             const Icon = test.icon;
@@ -141,16 +142,16 @@ export default function TestsPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-white text-sm lg:text-base">{test.name}</h3>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">{test.difficulty}</span>
+                      <h3 className="font-semibold text-white text-sm lg:text-base">{t(test.nameKey)}</h3>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">{t(test.difficultyKey)}</span>
                     </div>
-                    <p className="text-xs text-slate-400 mb-2">{test.description}</p>
+                    <p className="text-xs text-slate-400 mb-2">{t(test.descriptionKey)}</p>
                     <div className="flex items-center gap-3 text-[10px] text-slate-500">
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" />
-                        {test.duration}
+                        {t(test.durationKey)}
                       </span>
-                      <span className="px-2 py-0.5 rounded bg-slate-800">{test.category}</span>
+                      <span className="px-2 py-0.5 rounded bg-slate-800">{t(test.categoryKey)}</span>
                     </div>
                   </div>
                 </div>
@@ -167,10 +168,10 @@ export default function TestsPage() {
                       )}
                     </div>
                   ) : (
-                    <span className="text-xs text-slate-500">Not completed yet</span>
+                    <span className="text-xs text-slate-500">{t('testsPage.notCompletedYet')}</span>
                   )}
                   <div className="flex items-center gap-1 text-blue-400 group-hover:translate-x-1 transition-transform">
-                    <span className="text-sm font-medium">Start</span>
+                    <span className="text-sm font-medium">{t('testsPage.start')}</span>
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </div>
@@ -179,24 +180,20 @@ export default function TestsPage() {
           })}
         </div>
 
-        {/* Info Section */}
         <div className="bg-slate-900/50 rounded-2xl p-5 border border-slate-800">
           <div className="flex items-start gap-3">
             <TrendingUp className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-white text-sm mb-1">Why Cognitive Tests?</h3>
+              <h3 className="font-semibold text-white text-sm mb-1">{t('testsPage.whyCognitiveTests')}</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Regular cognitive testing helps track your brain health over time. These tests measure memory, 
-                attention, processing speed, and executive function. Results contribute to your overall CogniScore 
-                and help detect early changes in cognitive performance.
+                {t('testsPage.whyCognitiveTestsDesc')}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Disclaimer */}
         <p className="text-[10px] text-slate-600 text-center px-4">
-          This app does not provide medical advice or diagnosis. Always consult a healthcare professional.
+          {t('dashboard.disclaimer')}
         </p>
       </div>
     </div>
