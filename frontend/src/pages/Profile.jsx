@@ -328,22 +328,6 @@ export default function Profile() {
       setIsProcessing(false);
     }
   };
-        localStorage.setItem(userKey, JSON.stringify(newUserData));
-      }
-      
-      localStorage.removeItem('nakshatra-app');
-      setShowResetModal(false);
-      setSuccess(true);
-      
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
-    } catch (error) {
-      console.error('Error resetting data:', error);
-      setError(t('profile.errors.resetFailed'));
-      setIsProcessing(false);
-    }
-  };
 
   const tabs = [
     { id: 'profile', label: t('profile.profileTab'), icon: User },
