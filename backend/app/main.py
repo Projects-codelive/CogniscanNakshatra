@@ -1,19 +1,29 @@
+import os
+from dotenv import load_dotenv
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.mongodb import connect_to_mongo, close_mongo_connection
 from app.api import auth, patient, caregiver, speech, facial, alerts, risk
 import uvicorn
 
+# Load environment variables
+load_dotenv()
+
 app = FastAPI(title="CogniScan AI API", version="1.0.0")
 
 # Configure CORS for frontend access
+frontend_url = os.getenv("FRONTEND_URL")
+allowed_origins = [
+    "http://localhost:5173", # Vite default port
+    "http://localhost:3000",
+    "https://cogniscan-nakshatra.vercel.app"
+]
+if frontend_url:
+    allowed_origins.append(frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173", # Vite default port
-        "http://localhost:3000",
-        "https://cogniscan-nakshatra.vercel.app"
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
