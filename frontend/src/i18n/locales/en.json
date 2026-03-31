@@ -285,6 +285,7 @@
     "weeklySummary": "Weekly Summary",
     "recommendations": "Recommendations",
     "needsAttention": "Needs Attention",
+    "neutral": "Neutral",
     "monitorClosely": "Monitor Closely",
     "completeMoreTests": "Complete more tests and check-ins to see your weekly summary.",
     "whyCognitiveTests": "Why Cognitive Tests?",

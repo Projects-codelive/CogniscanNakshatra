@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const getScoreColor = (score) => {
   if (score === 0 || score === null || score === undefined) return { main: '#64748b', gradient: ['#64748b', '#94a3b8'] };
@@ -8,15 +9,16 @@ const getScoreColor = (score) => {
   return { main: '#ef4444', gradient: ['#ef4444', '#f87171'] };
 };
 
-const getScoreLabel = (score) => {
-  if (score === 0 || score === null || score === undefined) return 'No Data';
-  if (score >= 80) return 'Excellent';
-  if (score >= 60) return 'Good';
-  if (score >= 40) return 'Moderate';
-  return 'Needs Attention';
+const getScoreLabel = (score, t) => {
+  if (score === 0 || score === null || score === undefined) return t('insights.neutral', 'Neutral');
+  if (score >= 80) return t('insights.scoreLabel.excellent', 'Excellent');
+  if (score >= 60) return t('insights.scoreLabel.good', 'Good');
+  if (score >= 40) return t('insights.scoreLabel.fair', 'Moderate');
+  return t('insights.scoreLabel.needsAttention', 'Needs Attention');
 };
 
 export default function CogniScoreGauge({ score = 0, size = 200, strokeWidth = 12, showLabel = true }) {
+  const { t } = useTranslation();
   const [animatedScore, setAnimatedScore] = useState(0);
   
   const radius = (size - strokeWidth) / 2;
@@ -127,7 +129,7 @@ export default function CogniScoreGauge({ score = 0, size = 200, strokeWidth = 1
               backgroundColor: `${colors.main}20` 
             }}
           >
-            {animatedScore === 0 ? 'Get Started' : getScoreLabel(animatedScore)}
+            {getScoreLabel(animatedScore, t)}
           </span>
         )}
       </div>
