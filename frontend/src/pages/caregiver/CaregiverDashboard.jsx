@@ -32,12 +32,14 @@ import {
 } from 'lucide-react';
 
 const getScoreColor = (score) => {
+  if (!score || score === 0) return 'text-slate-400';
   if (score >= 70) return 'text-emerald-400';
   if (score >= 50) return 'text-yellow-400';
   return 'text-red-400';
 };
 
 const getScoreStatus = (score, t) => {
+  if (!score || score === 0) return { label: t('caregiver.noData', 'No Data'), color: 'bg-slate-500', textColor: 'text-slate-400' };
   if (score >= 70) return { label: t('caregiver.stable', 'Stable'), color: 'bg-emerald-500', textColor: 'text-emerald-400' };
   if (score >= 50) return { label: t('caregiver.monitor', 'Monitor'), color: 'bg-yellow-500', textColor: 'text-yellow-400' };
   return { label: t('caregiver.urgent', 'Urgent'), color: 'bg-red-500', textColor: 'text-red-400' };
@@ -73,18 +75,18 @@ export default function CaregiverDashboard() {
         return {
           name: userData.name || t('caregiver.patient'),
           email: userData.email,
-          cogniScore: userData.cogniScore || 72,
+          cogniScore: userData.cogniScore || 0,
           trend: userData.cogniTrend || 0,
           lastCheckin: userData.lastCheckin || null,
-          weeklyData: userData.weeklyData || [65, 68, 70, 72, 70, 73, 72],
+          weeklyData: userData.weeklyData || [],
           testsCompleted: userData.testsCompleted || 0,
           checkinsCompleted: userData.checkinsCompleted || 0,
           medicationAdherence: userData.medicationAdherence || 0,
           alerts: userData.alerts || [],
-          aiInsight: userData.aiInsight || t('caregiver.patientMaintainingActivity', 'Patient is maintaining regular activity levels.'),
-          speechScore: userData.speechScore || 78,
-          memoryScore: userData.memoryScore || 70,
-          attentionScore: userData.attentionScore || 75,
+          aiInsight: userData.aiInsight || '',
+          speechScore: userData.speechScore || 0,
+          memoryScore: userData.memoryScore || 0,
+          attentionScore: userData.attentionScore || 0,
         };
       } catch (e) {
         console.error('Error parsing patient data:', e);

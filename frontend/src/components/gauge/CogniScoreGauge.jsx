@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 const getScoreColor = (score) => {
+  if (score === 0 || score === null || score === undefined) return { main: '#64748b', gradient: ['#64748b', '#94a3b8'] };
   if (score >= 80) return { main: '#10b981', gradient: ['#10b981', '#34d399'] };
   if (score >= 60) return { main: '#06b6d4', gradient: ['#06b6d4', '#22d3ee'] };
   if (score >= 40) return { main: '#f59e0b', gradient: ['#f59e0b', '#fbbf24'] };
@@ -8,6 +9,7 @@ const getScoreColor = (score) => {
 };
 
 const getScoreLabel = (score) => {
+  if (score === 0 || score === null || score === undefined) return 'No Data';
   if (score >= 80) return 'Excellent';
   if (score >= 60) return 'Good';
   if (score >= 40) return 'Moderate';

@@ -785,6 +785,7 @@
     "headerTitle": "Caregiver",
     "noPatients": "No patients linked",
     "contactAdmin": "Contact administrator to link a patient.",
+    "noData": "No Data",
     "patient": "Patient",
     "patientId": "Patient ID",
     "status": "Status",
