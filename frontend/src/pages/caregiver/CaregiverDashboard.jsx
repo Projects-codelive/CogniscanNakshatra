@@ -37,10 +37,10 @@ const getScoreColor = (score) => {
   return 'text-red-400';
 };
 
-const getScoreStatus = (score) => {
-  if (score >= 70) return { label: 'Stable', color: 'bg-emerald-500', textColor: 'text-emerald-400' };
-  if (score >= 50) return { label: 'Monitor', color: 'bg-yellow-500', textColor: 'text-yellow-400' };
-  return { label: 'Urgent', color: 'bg-red-500', textColor: 'text-red-400' };
+const getScoreStatus = (score, t) => {
+  if (score >= 70) return { label: t('caregiver.stable', 'Stable'), color: 'bg-emerald-500', textColor: 'text-emerald-400' };
+  if (score >= 50) return { label: t('caregiver.monitor', 'Monitor'), color: 'bg-yellow-500', textColor: 'text-yellow-400' };
+  return { label: t('caregiver.urgent', 'Urgent'), color: 'bg-red-500', textColor: 'text-red-400' };
 };
 
 const getTrendIcon = (trend) => {
@@ -71,7 +71,7 @@ export default function CaregiverDashboard() {
       try {
         const userData = JSON.parse(storedUser);
         return {
-          name: userData.name || 'Patient',
+          name: userData.name || t('caregiver.patient'),
           email: userData.email,
           cogniScore: userData.cogniScore || 72,
           trend: userData.cogniTrend || 0,
@@ -81,7 +81,7 @@ export default function CaregiverDashboard() {
           checkinsCompleted: userData.checkinsCompleted || 0,
           medicationAdherence: userData.medicationAdherence || 0,
           alerts: userData.alerts || [],
-          aiInsight: userData.aiInsight || 'Patient is maintaining regular activity levels.',
+          aiInsight: userData.aiInsight || t('caregiver.patientMaintainingActivity', 'Patient is maintaining regular activity levels.'),
           speechScore: userData.speechScore || 78,
           memoryScore: userData.memoryScore || 70,
           attentionScore: userData.attentionScore || 75,
@@ -110,7 +110,7 @@ export default function CaregiverDashboard() {
   const handleAddPatient = async () => {
     setError('');
     if (!patientCode.trim() || patientCode.length !== 8) {
-      setError('Enter a valid 8-character code');
+      setError(t('caregiver.enterValidCode'));
       return;
     }
 
@@ -126,7 +126,7 @@ export default function CaregiverDashboard() {
       if (userData.shareCode === code) {
         foundPatient = {
           email: key.replace('nakshatra-user-', ''),
-          name: userData.name || 'Patient',
+          name: userData.name || t('caregiver.patient'),
           shareCode: code,
         };
         break;
@@ -134,13 +134,13 @@ export default function CaregiverDashboard() {
     }
 
     if (!foundPatient) {
-      setError('Invalid code. Check and try again.');
+      setError(t('caregiver.invalidCode'));
       setIsLoading(false);
       return;
     }
 
     if (linkedPatients.find(p => p.code === code)) {
-      setError('Already linked to this patient.');
+      setError(t('caregiver.alreadyLinked'));
       setIsLoading(false);
       return;
     }
@@ -200,8 +200,8 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
                 <ShieldCheck className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-white font-bold text-lg">Caregiver</h1>
-                <p className="text-slate-500 text-xs">{caregiver?.name || 'Caregiver'}</p>
+                <h1 className="text-white font-bold text-lg">{t('caregiver.headerTitle')}</h1>
+                <p className="text-slate-500 text-xs">{caregiver?.name || t('caregiver.headerTitle')}</p>
               </div>
             </div>
             
@@ -236,9 +236,9 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
         {showNotifications && notificationsEnabled && (
           <div className="absolute right-4 top-16 w-80 bg-slate-900 rounded-xl border border-slate-700 shadow-xl z-50">
             <div className="p-3 border-b border-slate-800 flex items-center justify-between">
-              <h3 className="font-semibold text-white">Notifications</h3>
+              <h3 className="font-semibold text-white">{t('caregiver.notifications')}</h3>
               <button onClick={() => setNotificationsEnabled(false)} className="text-xs text-slate-500 hover:text-white">
-                Disable
+                {t('caregiver.disable')}
               </button>
             </div>
             <div className="max-h-64 overflow-y-auto">
@@ -252,7 +252,7 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
               ) : (
                 <div className="p-4 text-center">
                   <CheckCircle className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
-                  <p className="text-sm text-slate-400">No concerns detected</p>
+                  <p className="text-sm text-slate-400">{t('caregiver.noConcernsDetected')}</p>
                 </div>
               )}
             </div>
@@ -268,14 +268,14 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
                 <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Users className="w-10 h-10 text-slate-600" />
                 </div>
-                <h2 className="text-xl font-bold text-white mb-2">No Patients Linked</h2>
-                <p className="text-slate-400 mb-6">Ask your patient for their share code</p>
+                <h2 className="text-xl font-bold text-white mb-2">{t('caregiver.noPatientsLinked')}</h2>
+                <p className="text-slate-400 mb-6">{t('caregiver.askForShareCode')}</p>
                 <button
                   onClick={() => setShowAddModal(true)}
                   className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-semibold transition-colors flex items-center gap-2 mx-auto"
                 >
                   <Plus className="w-5 h-5" />
-                  Link Patient
+                  {t('caregiver.linkPatient')}
                 </button>
               </div>
             ) : (
@@ -315,9 +315,9 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
                           </div>
                           <div>
                             <h2 className="text-xl font-bold text-white">{selectedPatientData.name}</h2>
-                            <span className={`inline-flex items-center gap-1 text-sm font-semibold ${getScoreStatus(selectedPatientData.cogniScore).textColor}`}>
-                              <span className={`w-2 h-2 rounded-full ${getScoreStatus(selectedPatientData.cogniScore).color}`} />
-                              {getScoreStatus(selectedPatientData.cogniScore).label}
+                            <span className={`inline-flex items-center gap-1 text-sm font-semibold ${getScoreStatus(selectedPatientData.cogniScore, t).textColor}`}>
+                              <span className={`w-2 h-2 rounded-full ${getScoreStatus(selectedPatientData.cogniScore, t).color}`} />
+                              {getScoreStatus(selectedPatientData.cogniScore, t).label}
                             </span>
                           </div>
                         </div>
@@ -334,7 +334,7 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
                           <p className={`text-5xl font-bold ${getScoreColor(selectedPatientData.cogniScore)}`}>
                             {selectedPatientData.cogniScore}
                           </p>
-                          <p className="text-slate-500 text-sm mt-1">CogniScore</p>
+                          <p className="text-slate-500 text-sm mt-1">{t('caregiver.cogniScoreLabel')}</p>
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
@@ -342,7 +342,7 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
                             <span className={`text-sm font-medium ${
                               selectedPatientData.trend > 0 ? 'text-emerald-400' : selectedPatientData.trend < 0 ? 'text-red-400' : 'text-slate-400'
                             }`}>
-                              {selectedPatientData.trend > 0 ? '+' : ''}{selectedPatientData.trend}% this week
+                              {selectedPatientData.trend > 0 ? '+' : ''}{selectedPatientData.trend}% {t('caregiver.thisWeek')}
                             </span>
                           </div>
                           <div className="flex items-end gap-1 h-12">
@@ -350,7 +350,7 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
                               <div key={i} className="flex-1 bg-slate-700 rounded-t" style={{ height: `${score * 0.6}%` }} />
                             ))}
                           </div>
-                          <p className="text-slate-500 text-xs mt-2">7-day trend</p>
+                          <p className="text-slate-500 text-xs mt-2">{t('caregiver.sevenDayTrend')}</p>
                         </div>
                       </div>
                     </div>
@@ -359,7 +359,7 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
                       <div className="bg-yellow-500/10 rounded-xl p-4 border border-yellow-500/20">
                         <h3 className="font-semibold text-yellow-400 mb-3 flex items-center gap-2">
                           <AlertTriangle className="w-5 h-5" />
-                          Alerts
+                          {t('caregiver.alerts')}
                         </h3>
                         <div className="space-y-2">
                           {notifications.map((alert, i) => (
@@ -376,7 +376,7 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
                       <div className="bg-emerald-500/10 rounded-xl p-4 border border-emerald-500/20">
                         <div className="flex items-center gap-2 text-emerald-400">
                           <CheckCircle className="w-5 h-5" />
-                          <span className="font-medium">No concerns detected</span>
+                          <span className="font-medium">{t('caregiver.noConcernsDetected')}</span>
                         </div>
                       </div>
                     )}
@@ -385,24 +385,24 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
                       <div className="bg-slate-900 rounded-xl p-4 border border-slate-800 text-center">
                         <Brain className="w-6 h-6 text-blue-400 mx-auto mb-2" />
                         <p className="text-2xl font-bold text-white">{selectedPatientData.testsCompleted}</p>
-                        <p className="text-xs text-slate-500">Tests</p>
+                        <p className="text-xs text-slate-500">{t('caregiver.tests')}</p>
                       </div>
                       <div className="bg-slate-900 rounded-xl p-4 border border-slate-800 text-center">
                         <Calendar className="w-6 h-6 text-purple-400 mx-auto mb-2" />
                         <p className="text-2xl font-bold text-white">{selectedPatientData.checkinsCompleted}/7</p>
-                        <p className="text-xs text-slate-500">Check-ins</p>
+                        <p className="text-xs text-slate-500">{t('caregiver.checkins')}</p>
                       </div>
                       <div className="bg-slate-900 rounded-xl p-4 border border-slate-800 text-center">
                         <Activity className="w-6 h-6 text-emerald-400 mx-auto mb-2" />
                         <p className="text-2xl font-bold text-white">{selectedPatientData.medicationAdherence}%</p>
-                        <p className="text-xs text-slate-500">Adherence</p>
+                        <p className="text-xs text-slate-500">{t('caregiver.adherence')}</p>
                       </div>
                     </div>
 
                     <div className="bg-slate-900 rounded-xl p-4 border border-slate-800">
                       <h3 className="font-semibold text-white mb-2 flex items-center gap-2">
                         <Mic className="w-5 h-5 text-blue-400" />
-                        AI Insight
+                        {t('caregiver.aiInsight')}
                       </h3>
                       <p className="text-slate-300 text-sm leading-relaxed">
                         {selectedPatientData.aiInsight}
@@ -413,7 +413,7 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
                       onClick={() => setExpandedSection(expandedSection === 'details' ? null : 'details')}
                       className="w-full bg-slate-900 rounded-xl p-4 border border-slate-800 flex items-center justify-between"
                     >
-                      <span className="font-medium text-white">View Details</span>
+                      <span className="font-medium text-white">{t('caregiver.viewDetails')}</span>
                       {expandedSection === 'details' ? (
                         <ChevronUp className="w-5 h-5 text-slate-400" />
                       ) : (
@@ -424,18 +424,18 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
                     {expandedSection === 'details' && (
                       <div className="bg-slate-900 rounded-xl p-4 border border-slate-800 space-y-4">
                         <div>
-                          <h4 className="text-sm font-medium text-slate-400 mb-2">Cognitive Breakdown</h4>
+                          <h4 className="text-sm font-medium text-slate-400 mb-2">{t('caregiver.cognitiveBreakdown')}</h4>
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <span className="text-sm text-slate-300">Memory</span>
+                              <span className="text-sm text-slate-300">{t('caregiver.memory')}</span>
                               <span className="font-semibold text-white">{selectedPatientData.memoryScore}</span>
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-sm text-slate-300">Attention</span>
+                              <span className="text-sm text-slate-300">{t('caregiver.attention')}</span>
                               <span className="font-semibold text-white">{selectedPatientData.attentionScore}</span>
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-sm text-slate-300">Speech</span>
+                              <span className="text-sm text-slate-300">{t('caregiver.speech')}</span>
                               <span className="font-semibold text-white">{selectedPatientData.speechScore}</span>
                             </div>
                           </div>
@@ -448,7 +448,7 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
                       className="w-full py-3 bg-slate-800 hover:bg-slate-700 rounded-xl font-medium text-white transition-colors flex items-center justify-center gap-2"
                     >
                       <Download className="w-5 h-5" />
-                      Export Weekly Report
+                      {t('caregiver.exportWeeklyReport')}
                     </button>
                   </div>
                 )}
@@ -458,49 +458,49 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
         ) : (
           <div className="space-y-4">
             <div className="bg-slate-900 rounded-2xl p-5 border border-slate-800">
-              <h3 className="font-semibold text-white mb-4">Account</h3>
+              <h3 className="font-semibold text-white mb-4">{t('caregiver.account')}</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between py-2 border-b border-slate-800">
-                  <span className="text-slate-400">Name</span>
+                  <span className="text-slate-400">{t('caregiver.name')}</span>
                   <span className="text-white font-medium">{caregiver?.name}</span>
                 </div>
                 <div className="flex items-center justify-between py-2">
-                  <span className="text-slate-400">Email</span>
+                  <span className="text-slate-400">{t('caregiver.email')}</span>
                   <span className="text-white font-medium">{caregiver?.email}</span>
                 </div>
               </div>
             </div>
 
             <div className="bg-slate-900 rounded-2xl p-5 border border-slate-800">
-              <h3 className="font-semibold text-white mb-4">Linked Patients ({linkedPatients.length})</h3>
-              {linkedPatients.length > 0 ? (
-                <div className="space-y-2">
-                  {linkedPatients.map(patient => (
-                    <div key={patient.code} className="flex items-center justify-between py-2">
-                      <span className="text-white">{patient.name}</span>
-                      <button
-                        onClick={() => handleRemovePatient(patient.code)}
-                        className="text-red-400 hover:text-red-300 text-sm"
-                      >
-                        Remove
-                      </button>
+              <h3 className="font-semibold text-white mb-4">{t('caregiver.linkedPatients')} ({linkedPatients.length})</h3>
+                  {linkedPatients.length > 0 ? (
+                    <div className="space-y-2">
+                      {linkedPatients.map(patient => (
+                        <div key={patient.code} className="flex items-center justify-between py-2">
+                          <span className="text-white">{patient.name}</span>
+                          <button
+                            onClick={() => handleRemovePatient(patient.code)}
+                            className="text-red-400 hover:text-red-300 text-sm"
+                          >
+                            {t('caregiver.remove')}
+                          </button>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-slate-500 text-sm">No patients linked</p>
-              )}
+                  ) : (
+                    <p className="text-slate-500 text-sm">{t('caregiver.noPatientsLinkedYet')}</p>
+                  )}
             </div>
 
             <div className="bg-slate-900 rounded-2xl p-5 border border-slate-800">
-              <h3 className="font-semibold text-white mb-4">Notifications</h3>
+              <h3 className="font-semibold text-white mb-4">{t('caregiver.notifications')}</h3>
               <button
                 onClick={() => setNotificationsEnabled(!notificationsEnabled)}
                 className={`w-full py-3 rounded-xl font-medium transition-colors flex items-center justify-between px-4 ${
                   notificationsEnabled ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 text-slate-400'
                 }`}
               >
-                <span>{notificationsEnabled ? 'Notifications On' : 'Notifications Off'}</span>
+                <span>{notificationsEnabled ? t('caregiver.notificationsOn') : t('caregiver.notificationsOff')}</span>
                 <span className={`w-3 h-3 rounded-full ${notificationsEnabled ? 'bg-emerald-400' : 'bg-slate-600'}`} />
               </button>
             </div>
@@ -510,7 +510,7 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
               className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
             >
               <LogOut className="w-5 h-5" />
-              Sign Out
+              {t('caregiver.signOut')}
             </button>
           </div>
         )}
@@ -520,13 +520,13 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
           <div className="bg-slate-900 rounded-2xl p-6 max-w-sm w-full border border-slate-800">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-bold text-white">Link Patient</h2>
+              <h2 className="text-lg font-bold text-white">{t('caregiver.linkPatient')}</h2>
               <button onClick={() => { setShowAddModal(false); setPatientCode(''); setError(''); }} className="p-2 rounded-lg bg-slate-800">
                 <X className="w-5 h-5 text-slate-400" />
               </button>
             </div>
 
-            <p className="text-slate-400 text-sm mb-4">Enter the 8-character code from your patient.</p>
+            <p className="text-slate-400 text-sm mb-4">{t('caregiver.enterPatientCode')}</p>
 
             <input
               type="text"
@@ -544,7 +544,7 @@ ${notifications.length > 0 ? 'ALERTS\n' + notifications.map(n => `- ${n}`).join(
               disabled={isLoading || patientCode.length !== 8}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
             >
-              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Link Patient'}
+              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : t('caregiver.linkPatient')}
             </button>
           </div>
         </div>

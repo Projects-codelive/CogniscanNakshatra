@@ -18,29 +18,29 @@ export default function CaregiverSignup() {
     setError('');
 
     if (!name || !email || !password || !confirmPassword) {
-      setError('Please fill in all fields');
+      setError(t('signup.errors.enterName'));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('signup.errors.passwordsMismatch'));
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(t('signup.errors.passwordTooShort'));
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError('Please enter a valid email');
+      setError(t('signup.errors.invalidEmail'));
       return;
     }
 
     const existing = localStorage.getItem(`nakshatra-caregiver-${email}`);
     if (existing) {
-      setError('An account with this email already exists');
+      setError(t('signup.errors.emailExists'));
       return;
     }
 
@@ -65,8 +65,8 @@ export default function CaregiverSignup() {
           <div className="w-16 h-16 bg-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <ShieldCheck className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white">Caregiver Account</h1>
-          <p className="text-slate-400 mt-2">Create account to monitor patients</p>
+          <h1 className="text-2xl font-bold text-white">{t('caregiver.caregiverAccount')}</h1>
+          <p className="text-slate-400 mt-2">{t('caregiver.createAccountMonitor')}</p>
         </div>
 
         <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
@@ -130,20 +130,20 @@ export default function CaregiverSignup() {
               disabled={isLoading}
               className="w-full h-12 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
             >
-              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Create Account'}
+              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : t('signup.createAccount')}
             </button>
 
             <p className="text-center text-slate-400 text-sm">
-              Already have an account?{' '}
+              {t('caregiver.alreadyHaveAccount')}{' '}
               <Link to="/caregiver/login" className="text-emerald-400 font-medium hover:underline">
-                Sign in
+                {t('caregiver.signIn')}
               </Link>
             </p>
           </div>
         </div>
 
         <p className="text-center text-slate-600 text-xs mt-6">
-          <Link to="/login" className="hover:text-slate-400">Patient login</Link>
+          <Link to="/login" className="hover:text-slate-400">{t('caregiver.patientLogin')}</Link>
         </p>
       </div>
     </div>

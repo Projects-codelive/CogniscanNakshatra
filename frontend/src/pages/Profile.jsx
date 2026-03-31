@@ -2,10 +2,19 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useAuthStore from '../store/useAuthStore';
-import { User, Download, LogOut, Eye, Type, Lock, Globe, KeyRound, Fingerprint, Trash2, RefreshCw, Loader2, Check, X, AlertTriangle, Pencil, Shield, Mail, LockKeyhole } from 'lucide-react';
+import { User, Download, LogOut, Eye, Type, Lock, Globe, KeyRound, Fingerprint, Trash2, RefreshCw, Loader2, Check, X, Pencil, Shield, Mail, LockKeyhole, Share2, Copy, ExternalLink, Users, Link2, Info } from 'lucide-react';
 import { getTestResults, getCheckIns } from '../store/db';
 import LanguageSelector from '../components/LanguageSelector';
 import { createPasskey, deletePasskey, hasPasskey, isPasskeySupported } from '../utils/passkey';
+
+const generateShareCode = () => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+};
 
 export default function Profile() {
   const { t } = useTranslation();
@@ -25,6 +34,10 @@ export default function Profile() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [shareCode, setShareCode] = useState('');
+  const [copied, setCopied] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [linkedCaregivers, setLinkedCaregivers] = useState([]);
 
   const loadData = useCallback(async () => {
     const tests = await getTestResults(100);
@@ -53,6 +66,24 @@ export default function Profile() {
     }
     localStorage.setItem('nakshatra-large-text', String(largeTextMode));
   }, [largeTextMode]);
+
+  useEffect(() => {
+    if (user?.email) {
+      const storedUser = localStorage.getItem(`nakshatra-user-${user.email}`);
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        if (userData.shareCode) {
+          setShareCode(userData.shareCode);
+        } else {
+          const newCode = generateShareCode();
+          userData.shareCode = newCode;
+          localStorage.setItem(`nakshatra-user-${user.email}`, JSON.stringify(userData));
+          setShareCode(newCode);
+        }
+        setLinkedCaregivers(userData.linkedCaregivers || []);
+      }
+    }
+  }, [user]);
 
   const handleLogout = () => {
     logout();
@@ -91,7 +122,7 @@ export default function Profile() {
     
     if (editType === 'name') {
       if (!editValue.trim() || editValue.trim().length < 2) {
-        setError('Name must be at least 2 characters');
+        setError(t('profile.errors.nameMinChars'));
         return;
       }
       setIsProcessing(true);
@@ -110,18 +141,18 @@ export default function Profile() {
     
     if (editType === 'email') {
       if (!editValue.trim()) {
-        setError('Email is required');
+        setError(t('profile.errors.emailRequired'));
         return;
       }
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(editValue.trim())) {
-        setError('Please enter a valid email');
+        setError(t('profile.errors.invalidEmail'));
         return;
       }
       
       const existingUser = localStorage.getItem(`nakshatra-user-${editValue.trim()}`);
       if (existingUser) {
-        setError('An account with this email already exists');
+        setError(t('profile.errors.emailExists'));
         return;
       }
       
@@ -141,11 +172,11 @@ export default function Profile() {
     
     if (editType === 'password') {
       if (!editValue || editValue.length < 6) {
-        setError('Password must be at least 6 characters');
+        setError(t('profile.errors.passwordMinChars'));
         return;
       }
       if (editValue !== editConfirmValue) {
-        setError('Passwords do not match');
+        setError(t('profile.errors.passwordsMismatch'));
         return;
       }
       
@@ -186,7 +217,7 @@ export default function Profile() {
       setUserHasPasskey(true);
       setUser({ ...user, hasPasskey: true });
     } catch {
-      setError('Failed to create passkey. Please try again.');
+      setError(t('profile.errors.passkeyFailed'));
     }
     setIsProcessing(false);
   };
@@ -198,10 +229,49 @@ export default function Profile() {
     setUser({ ...user, hasPasskey: false });
   };
 
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(shareCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      const textArea = document.createElement('textarea');
+      textArea.value = shareCode;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleRegenerateCode = async () => {
+    setIsGenerating(true);
+    await new Promise(r => setTimeout(r, 500));
+    
+    const newCode = generateShareCode();
+    if (user?.email) {
+      const storedUser = localStorage.getItem(`nakshatra-user-${user.email}`);
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        userData.shareCode = newCode;
+        localStorage.setItem(`nakshatra-user-${user.email}`, JSON.stringify(userData));
+        setShareCode(newCode);
+      }
+    }
+    setIsGenerating(false);
+  };
+
+  const handleOpenCaregiverPortal = () => {
+    window.open('/caregiver/login', '_blank');
+  };
+
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'security', label: 'Security', icon: Shield },
-    { id: 'settings', label: 'Settings', icon: Eye },
+    { id: 'profile', label: t('profile.profileTab'), icon: User },
+    { id: 'security', label: t('profile.securityTab'), icon: Shield },
+    { id: 'settings', label: t('profile.settingsTab'), icon: Eye },
+    { id: 'caregiver', label: t('profile.caregiverTab'), icon: Users },
   ];
 
   return (
@@ -242,10 +312,10 @@ export default function Profile() {
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h2 className="text-lg lg:text-xl font-bold text-white truncate">{user?.name || 'User'}</h2>
+                    <h2 className="text-lg lg:text-xl font-bold text-white truncate">{user?.name || t('profile.user')}</h2>
                     <p className="text-sm text-slate-500 truncate">{user?.email}</p>
                     <p className="text-xs text-slate-600 mt-1">
-                      {userHasPasskey ? 'Passkey + Password' : 'Password only'}
+                      {userHasPasskey ? t('profile.passkeyAndPassword') : t('profile.passwordOnly')}
                     </p>
                   </div>
                 </div>
@@ -258,8 +328,8 @@ export default function Profile() {
                 >
                   <User className="w-5 h-5 text-blue-400" />
                   <div className="flex-1 text-left">
-                    <p className="text-sm font-medium text-white">Name</p>
-                    <p className="text-xs text-slate-500">{user?.name || 'Not set'}</p>
+                    <p className="text-sm font-medium text-white">{t('profile.name')}</p>
+                    <p className="text-xs text-slate-500">{user?.name || t('profile.notSet')}</p>
                   </div>
                   <Pencil className="w-4 h-4 text-slate-500" />
                 </button>
@@ -270,7 +340,7 @@ export default function Profile() {
                 >
                   <Mail className="w-5 h-5 text-blue-400" />
                   <div className="flex-1 text-left">
-                    <p className="text-sm font-medium text-white">Email</p>
+                    <p className="text-sm font-medium text-white">{t('profile.email')}</p>
                     <p className="text-xs text-slate-500">{user?.email}</p>
                   </div>
                   <Pencil className="w-4 h-4 text-slate-500" />
@@ -289,8 +359,8 @@ export default function Profile() {
                   <LockKeyhole className="w-5 h-5 text-blue-400" />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="font-medium text-white text-sm">Change Password</p>
-                  <p className="text-xs text-slate-500">Update your login password</p>
+                  <p className="font-medium text-white text-sm">{t('profile.changePassword')}</p>
+                  <p className="text-xs text-slate-500">{t('profile.updatePassword')}</p>
                 </div>
                 <Pencil className="w-4 h-4 text-slate-500" />
               </button>
@@ -299,7 +369,7 @@ export default function Profile() {
                 <div className="bg-slate-900 rounded-2xl p-4 lg:p-5 border border-slate-800">
                   <div className="flex items-center gap-2 mb-4">
                     <KeyRound className="w-5 h-5 text-blue-400" />
-                    <p className="font-semibold text-white">Passkey</p>
+                    <p className="font-semibold text-white">{t('profile.passkey')}</p>
                   </div>
 
                   {userHasPasskey ? (
@@ -307,8 +377,8 @@ export default function Profile() {
                       <div className="flex items-center gap-3 py-2 px-3 bg-green-500/10 rounded-xl">
                         <Fingerprint className="w-5 h-5 text-green-400" />
                         <div className="flex-1">
-                          <p className="font-medium text-white text-sm">Passkey Active</p>
-                          <p className="text-xs text-slate-500">Login with Face ID, Touch ID, or PIN</p>
+                          <p className="font-medium text-white text-sm">{t('profile.passkeyActive')}</p>
+                          <p className="text-xs text-slate-500">{t('profile.passkeyActiveDesc')}</p>
                         </div>
                         <Check className="w-5 h-5 text-green-400" />
                       </div>
@@ -319,14 +389,14 @@ export default function Profile() {
                           className="flex-1 h-10 bg-slate-800 hover:bg-slate-700 rounded-xl font-medium text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
                         >
                           <RefreshCw className="w-4 h-4" />
-                          Change
+                          {t('profile.change')}
                         </button>
                         <button
                           onClick={handleDeletePasskey}
                           className="flex-1 h-10 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl font-medium text-sm transition-colors flex items-center justify-center gap-2"
                         >
                           <Trash2 className="w-4 h-4" />
-                          Remove
+                          {t('profile.remove')}
                         </button>
                       </div>
                     </div>
@@ -335,8 +405,8 @@ export default function Profile() {
                       <div className="flex items-center gap-3 py-2 px-3 bg-slate-800/50 rounded-xl">
                         <KeyRound className="w-5 h-5 text-slate-400" />
                         <div>
-                          <p className="font-medium text-white text-sm">No Passkey</p>
-                          <p className="text-xs text-slate-500">Add for quick & secure login</p>
+                          <p className="font-medium text-white text-sm">{t('profile.noPasskey')}</p>
+                          <p className="text-xs text-slate-500">{t('profile.noPasskeyDesc')}</p>
                         </div>
                       </div>
                       <button
@@ -349,7 +419,7 @@ export default function Profile() {
                         ) : (
                           <Fingerprint className="w-4 h-4" />
                         )}
-                        Add Passkey
+                        {t('profile.addPasskey')}
                       </button>
                     </div>
                   )}
@@ -363,15 +433,15 @@ export default function Profile() {
               <div className="bg-slate-900 rounded-2xl p-4 lg:p-5 border border-slate-800">
                 <div className="flex items-center gap-2 mb-4">
                   <Eye className="w-5 h-5 text-blue-400" />
-                  <p className="font-semibold text-white">Accessibility</p>
+                  <p className="font-semibold text-white">{t('profile.accessibility')}</p>
                 </div>
 
                 <div className="flex items-center justify-between py-2">
                   <div className="flex items-center gap-3">
                     <Type className="w-5 h-5 text-slate-400" />
                     <div>
-                      <p className="font-medium text-white text-sm">Large Text</p>
-                      <p className="text-xs text-slate-500 hidden sm:block">Increase text size</p>
+                      <p className="font-medium text-white text-sm">{t('profile.largeText')}</p>
+                      <p className="text-xs text-slate-500 hidden sm:block">{t('profile.largeTextDesc')}</p>
                     </div>
                   </div>
                   <button
@@ -388,7 +458,7 @@ export default function Profile() {
               <div className="bg-slate-900 rounded-2xl p-4 lg:p-5 border border-slate-800">
                 <div className="flex items-center gap-2 mb-4">
                   <Globe className="w-5 h-5 text-blue-400" />
-                  <p className="font-semibold text-white">Language</p>
+                  <p className="font-semibold text-white">{t('profile.language')}</p>
                 </div>
                 <LanguageSelector variant="buttons" />
               </div>
@@ -396,7 +466,7 @@ export default function Profile() {
               <div className="bg-slate-900 rounded-2xl p-4 lg:p-5 border border-slate-800">
                 <div className="flex items-center gap-2 mb-4">
                   <Download className="w-5 h-5 text-blue-400" />
-                  <p className="font-semibold text-white">Data</p>
+                  <p className="font-semibold text-white">{t('profile.data')}</p>
                 </div>
                 <button
                   onClick={exportData}
@@ -404,13 +474,145 @@ export default function Profile() {
                 >
                   <Download className="w-5 h-5 text-slate-400" />
                   <div className="text-left">
-                    <p className="font-medium text-white text-sm">Export My Data</p>
-                    <p className="text-xs text-slate-500">Download all your data</p>
+                    <p className="font-medium text-white text-sm">{t('profile.exportData')}</p>
+                    <p className="text-xs text-slate-500">{t('profile.exportDataDesc')}</p>
                   </div>
                 </button>
                 <div className="flex items-start gap-3 mt-4 pt-4 border-t border-slate-800">
                   <Lock className="w-4 h-4 text-slate-600 shrink-0 mt-0.5" />
-                  <p className="text-xs text-slate-600">Your data is stored locally on your device.</p>
+                  <p className="text-xs text-slate-600">{t('profile.dataStoredLocally')}</p>
+                </div>
+              </div>
+            </>
+          )}
+
+          {activeTab === 'caregiver' && (
+            <>
+              <div className="bg-slate-900 rounded-2xl p-4 lg:p-6 border border-slate-800">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                    <Share2 className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div>
+                    <h2 className="font-semibold text-white">{t('settings.shareCaregiver.title')}</h2>
+                    <p className="text-xs text-slate-500">{t('settings.shareCaregiver.description')}</p>
+                  </div>
+                </div>
+
+                <div className="bg-slate-800/50 rounded-xl p-4 mb-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm text-slate-400">{t('settings.shareCaregiver.yourShareCode')}</span>
+                    <button
+                      onClick={handleRegenerateCode}
+                      disabled={isGenerating}
+                      className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 disabled:opacity-50"
+                    >
+                      {isGenerating ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <RefreshCw className="w-3 h-3" />
+                      )}
+                      {t('settings.shareCaregiver.regenerate')}
+                    </button>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 bg-slate-900 rounded-lg px-4 py-3 border border-slate-700">
+                      <span className="text-xl font-mono font-bold text-white tracking-wider">
+                        {shareCode || t('common.loading')}
+                      </span>
+                    </div>
+                    <button
+                      onClick={handleCopyCode}
+                      className={`h-11 px-4 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
+                        copied 
+                          ? 'bg-green-600 text-white' 
+                          : 'bg-blue-600 hover:bg-blue-500 text-white'
+                      }`}
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          {t('settings.shareCaregiver.copied')}
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          {t('settings.shareCaregiver.copy')}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-blue-500/10 rounded-xl p-4 border border-blue-500/20">
+                  <div className="flex items-start gap-3">
+                    <Info className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="text-blue-400 font-medium mb-1">{t('settings.shareCaregiver.howItWorks.title')}</p>
+                      <p className="text-slate-400">
+                        {t('settings.shareCaregiver.howItWorks.description')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleOpenCaregiverPortal}
+                  className="w-full mt-4 h-11 bg-slate-800 hover:bg-slate-700 rounded-xl font-medium text-sm transition-colors flex items-center justify-center gap-2"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  {t('settings.openPortal')}
+                </button>
+              </div>
+
+              {linkedCaregivers.length > 0 && (
+                <div className="bg-slate-900 rounded-2xl p-4 lg:p-6 border border-slate-800">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
+                      <Users className="w-5 h-5 text-green-400" />
+                    </div>
+                    <div>
+                      <h2 className="font-semibold text-white">{t('settings.linkedCaregivers.title')}</h2>
+                      <p className="text-xs text-slate-500">{t('settings.linkedCaregivers.count', { count: linkedCaregivers.length })}</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    {linkedCaregivers.map((cg, index) => (
+                      <div key={index} className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-xl">
+                        <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center">
+                          <Shield className="w-5 h-5 text-slate-400" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-white">{cg.name || t('settings.linkedCaregivers.caregiver')}</p>
+                          <p className="text-xs text-slate-500">{t('settings.linkedCaregivers.linked', { date: new Date(cg.linkedAt).toLocaleDateString() })}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="bg-slate-900 rounded-2xl p-4 lg:p-6 border border-slate-800">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                    <Link2 className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div>
+                    <h2 className="font-semibold text-white">{t('settings.connectionStatus.title')}</h2>
+                    <p className="text-xs text-slate-500">{t('settings.connectionStatus.description')}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2 h-2 rounded-full ${linkedCaregivers.length > 0 ? 'bg-green-500' : 'bg-slate-500'}`} />
+                      <span className="text-sm text-white">{t('settings.connectionStatus.caregiverLinks')}</span>
+                    </div>
+                    <span className="text-sm text-slate-400">{t('settings.connectionStatus.active', { count: linkedCaregivers.length })}</span>
+                  </div>
                 </div>
               </div>
             </>
@@ -421,7 +623,7 @@ export default function Profile() {
             className="w-full py-3 bg-slate-800 hover:bg-red-500/10 text-slate-300 hover:text-red-400 rounded-xl font-medium transition-all flex items-center justify-center gap-2"
           >
             <LogOut className="w-4 h-4" />
-            Sign Out
+            {t('profile.signOut')}
           </button>
         </div>
       </div>
@@ -452,18 +654,18 @@ export default function Profile() {
                   <Check className="w-7 h-7 text-green-400" />
                 </div>
                 <h2 className="text-lg font-bold text-white">
-                  {editType === 'name' && 'Name Updated!'}
-                  {editType === 'email' && 'Email Updated!'}
-                  {editType === 'password' && 'Password Changed!'}
+                  {editType === 'name' && t('profile.nameUpdated')}
+                  {editType === 'email' && t('profile.emailUpdated')}
+                  {editType === 'password' && t('profile.passwordChanged')}
                 </h2>
               </div>
             ) : (
               <>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-lg font-bold text-white">
-                    {editType === 'name' && 'Edit Name'}
-                    {editType === 'email' && 'Change Email'}
-                    {editType === 'password' && 'Change Password'}
+                    {editType === 'name' && t('profile.editName')}
+                    {editType === 'email' && t('profile.changeEmail')}
+                    {editType === 'password' && t('profile.changePassword')}
                   </h2>
                   <button
                     onClick={() => setShowEditModal(false)}
@@ -476,12 +678,12 @@ export default function Profile() {
                 {editType === 'name' && (
                   <div className="space-y-4">
                     <div>
-                      <label className="text-sm font-medium text-slate-300 mb-2 block">Name</label>
+                      <label className="text-sm font-medium text-slate-300 mb-2 block">{t('profile.name')}</label>
                       <input
                         type="text"
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
-                        placeholder={user?.name || 'Enter your name'}
+                        placeholder={user?.name || t('profile.namePlaceholder')}
                         className="w-full h-12 px-4 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                       />
                     </div>
@@ -538,7 +740,7 @@ export default function Profile() {
                   {isProcessing ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
-                    'Save Changes'
+                    t('profile.saveChanges')
                   )}
                 </button>
               </>
