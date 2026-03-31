@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useAuthStore from '../store/useAuthStore';
-import { Mail, Lock, Loader2, BrainCircuit, KeyRound, Fingerprint } from 'lucide-react';
+import { Mail, Lock, Loader2, BrainCircuit, KeyRound, Fingerprint, Shield } from 'lucide-react';
 import { authenticateWithPasskey, isPasskeySupported } from '../utils/passkey';
 
 export default function Login() {
@@ -234,6 +234,16 @@ export default function Login() {
                   {t('login.signUp')}
                 </Link>
               </p>
+            </div>
+
+            <div className="border-t border-slate-800 pt-4 mt-4">
+              <Link 
+                to="/caregiver/login" 
+                className="flex items-center justify-center gap-2 w-full h-11 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-medium text-sm transition-colors"
+              >
+                <Shield className="w-4 h-4" />
+                {t('login.loginAsCaregiver')}
+              </Link>
             </div>
           </div>
         </div>

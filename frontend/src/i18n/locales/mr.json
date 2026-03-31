@@ -88,6 +88,7 @@
     "signingIn": "साइन इन होत आहे...",
     "noAccount": "खाते नाही?",
     "signUp": "साइन अप करा",
+    "loginAsCaregiver": "देखभालकर्ता म्हणून लॉगिन करा",
     "errors": {
       "enterCredentials": "कृपया तुमचा ईमेल आणि पासवर्ड टाका",
       "noAccount": "या ईमेलने खाते आढळले नाही",
