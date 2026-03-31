@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   LayoutDashboard, 
   Activity, 
-  Users, 
   User, 
   Camera, 
   ClipboardCheck,
@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 
 const BottomNav = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [showMore, setShowMore] = useState(false);
@@ -35,43 +36,42 @@ const BottomNav = () => {
   };
 
   const menuItems = [
-    { id: 'dashboard', label: 'Home', path: '/', icon: LayoutDashboard },
-    { id: 'facial', label: 'Face', path: '/facial', icon: Camera },
-    { id: 'speech', label: 'Speech', path: '/speech', icon: Mic },
-    { id: 'more', label: 'More', path: '#', icon: MoreHorizontal, isAction: true },
-    { id: 'caregiver', label: 'Care', path: '/caregiver', icon: Users },
-    { id: 'profile', label: 'Profile', path: '/profile', icon: User },
+    { id: 'dashboard', label: t('nav.home'), path: '/', icon: LayoutDashboard },
+    { id: 'facial', label: t('nav.face'), path: '/facial', icon: Camera },
+    { id: 'speech', label: t('nav.speech'), path: '/speech', icon: Mic },
+    { id: 'more', label: t('nav.more'), path: '#', icon: MoreHorizontal, isAction: true },
+    { id: 'profile', label: t('nav.profile'), path: '/profile', icon: User },
   ];
 
   const moreOptions = [
     { 
       id: 'checkin', 
-      label: 'Check-in', 
-      desc: 'Daily mood & wellness tracking',
+      label: t('nav.checkin'), 
+      desc: t('dashboard.quickActions.checkinDesc'),
       path: '/checkin', 
       icon: ClipboardCheck,
       color: 'bg-green-500',
     },
     { 
       id: 'tests', 
-      label: 'Cognitive Tests', 
-      desc: 'Memory, attention, reaction time',
+      label: t('nav.tests'), 
+      desc: t('dashboard.quickActions.testsDesc'),
       path: '/tests', 
       icon: Brain,
       color: 'bg-violet-500',
     },
     { 
       id: 'medications', 
-      label: 'Medications', 
-      desc: 'Track your medications',
+      label: t('nav.medications'), 
+      desc: t('dashboard.quickActions.checkinDesc'),
       path: '/medications', 
       icon: Pill,
       color: 'bg-emerald-500',
     },
     { 
       id: 'insights', 
-      label: 'Insights', 
-      desc: 'Detailed analysis & trends',
+      label: t('nav.insights'), 
+      desc: t('dashboard.quickActions.facialDesc'),
       path: '/insights', 
       icon: BarChart3,
       color: 'bg-blue-500',
@@ -79,8 +79,8 @@ const BottomNav = () => {
 
     { 
       id: 'settings', 
-      label: 'Settings', 
-      desc: 'App preferences',
+      label: t('nav.settings'), 
+      desc: t('profile.accessibility'),
       path: '/settings', 
       icon: Settings,
       color: 'bg-slate-500',
@@ -122,7 +122,7 @@ const BottomNav = () => {
             style={{ maxHeight: '70vh', overflowY: 'auto' }}
           >
             <div className="sticky top-0 bg-slate-900 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-              <h2 className="font-semibold text-white">More Options</h2>
+              <h2 className="font-semibold text-white">{t('nav.moreOptions')}</h2>
               <button 
                 onClick={() => setShowMore(false)}
                 className="p-2 rounded-full hover:bg-slate-800 transition-colors"
@@ -159,7 +159,7 @@ const BottomNav = () => {
                 className="w-full flex items-center justify-center gap-2 p-3 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500/20 transition-colors"
               >
                 <LogOut className="w-5 h-5" />
-                <span className="font-medium">Sign Out</span>
+                <span className="font-medium">{t('profile.signOut')}</span>
               </button>
             </div>
           </div>

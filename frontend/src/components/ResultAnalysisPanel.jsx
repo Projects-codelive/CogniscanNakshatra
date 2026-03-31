@@ -14,6 +14,7 @@ import {
   ChevronUp,
   Download
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import CognitiveFluencyScoreBadge from './CognitiveFluencyScoreBadge';
 import SpeechTimelineVisualizer from './SpeechTimelineVisualizer';
 import CognitiveStateTimeline from './CognitiveStateTimeline';
@@ -109,6 +110,7 @@ const ResultAnalysisPanel = ({
   onRetake,
   onNextChallenge 
 }) => {
+  const { t } = useTranslation();
   const [expandedSections, setExpandedSections] = React.useState({
     score: true,
     timeline: true,
@@ -163,9 +165,9 @@ const ResultAnalysisPanel = ({
                 <Brain className="w-5 h-5 text-blue-400" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">Analysis Report</h2>
+                <h2 className="text-lg font-bold text-white">{t('resultPanel.analysisReport')}</h2>
                 <p className="text-xs text-slate-500">
-                  {word_count} words • {formatDuration(duration_ms)} duration
+                  {t('resultPanel.wordsDuration', { count: word_count, duration: formatDuration(duration_ms) })}
                 </p>
               </div>
             </div>
@@ -175,13 +177,13 @@ const ResultAnalysisPanel = ({
                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition-all border border-slate-700 flex items-center gap-2"
               >
                 <RotateCcw className="w-4 h-4" />
-                Retake
+                {t('resultPanel.retake')}
               </button>
               <button
                 onClick={onNextChallenge}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-blue-900/30 flex items-center gap-2"
               >
-                Next Challenge
+                {t('resultPanel.nextChallenge')}
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button
@@ -198,7 +200,7 @@ const ResultAnalysisPanel = ({
               onClick={() => toggleSection('score')}
               className="w-full flex items-center justify-between mb-4"
             >
-              <SectionHeader icon={BarChart3} title="Cognitive Fluency Score" />
+              <SectionHeader icon={BarChart3} title={t('resultPanel.cognitiveFluencyScore')} />
               {expandedSections.score ? (
                 <ChevronUp className="w-5 h-5 text-slate-500" />
               ) : (
@@ -221,8 +223,8 @@ const ResultAnalysisPanel = ({
             >
               <SectionHeader 
                 icon={Clock} 
-                title="Pause & Hesitation Analysis" 
-                count={`${pause_timeline?.length || 0} pauses`}
+                title={t('resultPanel.pauseHesitationAnalysis')} 
+                count={t('resultPanel.pausesCount', { count: pause_timeline?.length || 0 })}
               />
               {expandedSections.timeline ? (
                 <ChevronUp className="w-5 h-5 text-slate-500" />
@@ -249,7 +251,7 @@ const ResultAnalysisPanel = ({
             >
               <SectionHeader 
                 icon={Brain} 
-                title="Cognitive State Detection" 
+                title={t('resultPanel.cognitiveStateDetection')} 
                 count={cognitive_states?.length || 0}
               />
               {expandedSections.cognitive ? (
@@ -327,7 +329,7 @@ const ResultAnalysisPanel = ({
             >
               <SectionHeader 
                 icon={AlertTriangle} 
-                title="Risk Flags Summary" 
+                title={t('resultPanel.riskFlagsSummary')} 
                 count={risk_flags?.filter(f => f.severity !== 'None').length || 0}
               />
               {expandedSections.flags ? (

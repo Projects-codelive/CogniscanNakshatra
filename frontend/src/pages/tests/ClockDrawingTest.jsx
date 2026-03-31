@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
   RotateCcw,
@@ -78,6 +79,7 @@ const ScoreArc = ({ score, maxScore = 10 }) => {
 };
 
 const ClockDrawingTest = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const canvasRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -368,7 +370,7 @@ const ClockDrawingTest = () => {
         <div className="flex items-center gap-3">
           <div className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 flex items-center gap-2">
             <Timer className="w-4 h-4 text-blue-400" />
-            <span className="text-slate-300 text-sm font-semibold">~3 Minutes</span>
+            <span className="text-slate-300 text-sm font-semibold">{t('tests.threeMinutes')}</span>
           </div>
         </div>
       </div>
@@ -377,20 +379,20 @@ const ClockDrawingTest = () => {
         <div className="max-w-2xl mx-auto mt-12">
           <InstructionCard
             icon={PenTool}
-            title="Test Instructions"
+            title={t('tests.testInstructions')}
             instructions={
               <div className="text-slate-300 space-y-3">
                 <p>
-                  Draw a clock face with numbers 1 through 12, then draw the hour and minute hands to show <strong className="text-white">11:10</strong>.
+                  {t('tests.drawClockFace')}
                 </p>
-                <div className="space-y-2 mt-4 ml-2">
+                <div className="space-y-2 ml-2">
                   <div className="flex gap-3">
                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center text-xs font-bold">1</span>
-                    <p>Ensure all 12 numbers are placed clearly inside the circle.</p>
+                    <p>{t('tests.ensureNumbers')}</p>
                   </div>
                   <div className="flex gap-3">
                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center text-xs font-bold">2</span>
-                    <p>The test is timed. Take your time but be precise.</p>
+                    <p>{t('tests.testIsTimed')}</p>
                   </div>
                 </div>
               </div>
@@ -400,7 +402,7 @@ const ClockDrawingTest = () => {
             onClick={() => setPhase('test')}
             className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/20"
           >
-            Start Assessment →
+            {t('tests.startAssessment')} →
           </button>
         </div>
       )}
@@ -410,16 +412,16 @@ const ClockDrawingTest = () => {
           <div className="lg:col-span-4 flex flex-col gap-6">
             <InstructionCard
               icon={PenTool}
-              title="Instructions"
+              title={t('tests.instructions')}
               instructions={
                 <p className="text-slate-300 text-sm leading-relaxed">
-                  Draw a clock face with numbers 1 through 12, then draw the hour and minute hands to show <strong className="text-white">11:10</strong>.
+                  {t('tests.drawClockFace')}
                 </p>
               }
             />
             
             <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800 text-center shadow-xl">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Time Elapsed</p>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">{t('tests.timeElapsed')}</p>
               <p className="text-4xl font-black text-blue-500 tracking-tight">{formatTime(elapsedTime)}</p>
             </div>
           </div>
@@ -432,7 +434,7 @@ const ClockDrawingTest = () => {
                   onClick={undo}
                   disabled={strokes.length === 0}
                   className="w-10 h-10 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:hover:bg-slate-800 rounded-full flex items-center justify-center text-white transition-colors"
-                  title="Undo"
+                  title={t('tests.undo')}
                 >
                   <Undo2 className="w-5 h-5" />
                 </button>
@@ -487,7 +489,7 @@ const ClockDrawingTest = () => {
                 onClick={submitDrawing}
                 className="w-full mt-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/20"
               >
-                Submit Drawing →
+                {t('tests.submitDrawing')} →
               </button>
             </div>
           </div>
@@ -497,8 +499,8 @@ const ClockDrawingTest = () => {
       {phase === 'analyzing' && (
         <div className="flex flex-col items-center justify-center min-h-[500px]">
           <div className="w-20 h-20 rounded-full border-4 border-slate-800 border-t-blue-500 animate-spin mb-6"></div>
-          <h2 className="text-2xl font-black text-white mb-2">Analyzing drawing...</h2>
-          <p className="text-slate-400">Computing spatial relationships and vector points</p>
+          <h2 className="text-2xl font-black text-white mb-2">{t('tests.analyzingDrawing')}</h2>
+          <p className="text-slate-400">{t('tests.computingSpatial')}</p>
         </div>
       )}
 
@@ -506,44 +508,44 @@ const ClockDrawingTest = () => {
         <div className="max-w-4xl mx-auto slide-in-bottom">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-slate-900 rounded-[2rem] p-8 border border-slate-800 shadow-2xl flex flex-col items-center justify-center">
-              <h3 className="text-lg font-bold text-slate-300 mb-8">Overall Performance</h3>
+              <h3 className="text-lg font-bold text-slate-300 mb-8">{t('tests.overallPerformance')}</h3>
               <ScoreArc score={scoreData.total} maxScore={10} />
               <div className="mt-8 px-6 py-2 rounded-full bg-slate-800/50 border border-slate-700">
                 <span className="text-sm font-bold text-white tracking-wide">
-                  Rating: <span className="text-blue-400 ml-1">{getRating(scoreData.total)}</span>
+                  {t('tests.rating')}: <span className="text-blue-400 ml-1">{getRating(scoreData.total)}</span>
                 </span>
               </div>
             </div>
 
             <div className="bg-slate-900 rounded-[2rem] p-8 border border-slate-800 shadow-xl flex flex-col">
-              <h3 className="text-lg font-bold text-slate-300 mb-6">Point Breakdown</h3>
+              <h3 className="text-lg font-bold text-slate-300 mb-6">{t('tests.pointBreakdown')}</h3>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
                 <div className="bg-slate-800/50 rounded-2xl p-4 flex items-center justify-between">
                   <span className="text-slate-300 font-medium flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                    Clock Face
+                    {t('tests.clockFace')}
                   </span>
                   <span className="text-blue-400 font-bold">{scoreData.breakdown.circle} / 1</span>
                 </div>
                 <div className="bg-slate-800/50 rounded-2xl p-4 flex items-center justify-between">
                   <span className="text-slate-300 font-medium flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                    Number Plcmt
+                    {t('tests.numberPlacement')}
                   </span>
                   <span className="text-blue-400 font-bold">{scoreData.breakdown.numbers} / 4</span>
                 </div>
                 <div className="bg-slate-800/50 rounded-2xl p-4 flex items-center justify-between">
                   <span className="text-slate-300 font-medium flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                    Hand Accrcy
+                    {t('tests.handAccuracy')}
                   </span>
                   <span className="text-blue-400 font-bold">{scoreData.breakdown.hands} / 3</span>
                 </div>
                 <div className="bg-slate-800/50 rounded-2xl p-4 flex items-center justify-between">
                   <span className="text-slate-300 font-medium flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                    Time Bonus
+                    {t('tests.timeBonus')}
                   </span>
                   <span className="text-blue-400 font-bold">{scoreData.breakdown.time} / 2</span>
                 </div>
@@ -559,13 +561,13 @@ const ClockDrawingTest = () => {
                   }}
                   className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors border border-slate-700"
                 >
-                  Retake Test
+                  {t('tests.retakeTest')}
                 </button>
                 <button
                   onClick={() => navigate('/tests')}
                   className="flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition-transform shadow-lg shadow-blue-500/20"
                 >
-                  Continue →
+                  {t('tests.continue')} →
                 </button>
               </div>
             </div>

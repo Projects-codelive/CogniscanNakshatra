@@ -6,7 +6,6 @@ export const useAppStore = create(
     (set) => ({
       activeTab: 'dashboard',
       setActiveTab: (tab) => set({ activeTab: tab }),
-      patientName: 'Eleanor Miller',
       isSidebarOpen: true,
       toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
       cogniScore: 72,

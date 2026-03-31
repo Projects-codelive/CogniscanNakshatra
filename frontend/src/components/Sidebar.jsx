@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   LayoutDashboard, 
   Activity,
-  Users,
   Settings,
   LogOut, 
   ChevronRight,
@@ -23,6 +23,7 @@ import {
 import useAuthStore from '../store/useAuthStore';
 
 const Sidebar = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthStore();
@@ -52,35 +53,35 @@ const Sidebar = () => {
   const navGroups = [
     {
       id: 'overview',
-      label: 'Overview',
+      label: t('nav.overview'),
       items: [
-        { id: 'dashboard', label: 'Dashboard', path: '/', icon: LayoutDashboard },
-        { id: 'checkin', label: 'Daily Check-in', path: '/checkin', icon: ClipboardCheck },
+        { id: 'dashboard', label: t('nav.dashboard'), path: '/', icon: LayoutDashboard },
+        { id: 'checkin', label: t('nav.dailyCheckin'), path: '/checkin', icon: ClipboardCheck },
       ]
     },
     {
       id: 'assessment',
-      label: 'Assessment',
+      label: t('nav.assessment'),
       items: [
-        { id: 'tests', label: 'Cognitive Tests', path: '/tests', icon: Brain },
-        { id: 'speech', label: 'Speech Analysis', path: '/speech', icon: Mic },
-        { id: 'facial', label: 'Facial Analysis', path: '/facial', icon: Camera },
+        { id: 'tests', label: t('nav.cognitiveTests'), path: '/tests', icon: Brain },
+        { id: 'speech', label: t('nav.speechAnalysis'), path: '/speech', icon: Mic },
+        { id: 'facial', label: t('nav.facialAnalysis'), path: '/facial', icon: Camera },
       ]
     },
     {
       id: 'insights',
-      label: 'Insights',
+      label: t('nav.insights'),
       items: [
-        { id: 'insights', label: 'Insights', path: '/insights', icon: TrendingUp },
-        { id: 'medications', label: 'Medications', path: '/medications', icon: Pill },
+        { id: 'insights', label: t('nav.insights'), path: '/insights', icon: TrendingUp },
+        { id: 'medications', label: t('nav.medications'), path: '/medications', icon: Pill },
       ]
     },
     {
       id: 'system',
-      label: 'System',
+      label: t('nav.system'),
       items: [
-        { id: 'caregiver', label: 'Caregiver Portal', path: '/caregiver', icon: Users },
-        { id: 'profile', label: 'Profile', path: '/profile', icon: User },
+        { id: 'profile', label: t('nav.profile'), path: '/profile', icon: User },
+        { id: 'settings', label: t('nav.settings'), path: '/settings', icon: Settings },
       ]
     },
   ];
@@ -92,8 +93,8 @@ const Sidebar = () => {
           <BrainCircuit className="text-white w-6 h-6" />
         </div>
         <div>
-          <h1 className="text-white font-bold text-lg">Nakshatra</h1>
-          <p className="text-[10px] text-slate-500 uppercase tracking-wide">Cognitive Health</p>
+          <h1 className="text-white font-bold text-lg">{t('app.name')}</h1>
+          <p className="text-[10px] text-slate-500 uppercase tracking-wide">{t('app.tagline')}</p>
         </div>
       </div>
 
@@ -118,9 +119,9 @@ const Sidebar = () => {
                     key={item.id}
                     onClick={() => handleNavClick(item.path)}
                     className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 group ${
-                      isActive(item.path)
-                        ? 'bg-blue-600 text-white' 
-                        : 'hover:bg-slate-800 hover:text-white text-slate-400'
+                        isActive(item.path)
+                          ? 'bg-blue-600 text-white' 
+                          : 'hover:bg-slate-800 hover:text-white text-slate-400'
                     }`}
                   >
                     <item.icon size={18} />
@@ -137,8 +138,8 @@ const Sidebar = () => {
       <div className="p-4 mt-auto border-t border-slate-800">
         {user && (
           <div className="bg-slate-800/50 rounded-xl p-3 mb-3">
-            <p className="text-xs font-semibold text-white truncate">{user.email}</p>
-            <p className="text-[10px] text-slate-500">User Account</p>
+            <p className="text-xs font-semibold text-white truncate">{user.name || user.email}</p>
+            <p className="text-[10px] text-slate-500">{user.hasPasskey ? 'Passkey + Password' : 'Password'}</p>
           </div>
         )}
         <button 
@@ -146,7 +147,7 @@ const Sidebar = () => {
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-500/10 hover:text-red-400 transition-colors text-slate-400 group"
         >
           <LogOut size={18} />
-          <span className="text-sm font-medium">Logout</span>
+          <span className="text-sm font-medium">{t('nav.logout')}</span>
         </button>
       </div>
     </aside>

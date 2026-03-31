@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
   Timer,
@@ -94,6 +95,7 @@ const ResultChart = ({ data }) => {
 const TOTAL_ROUNDS = 8;
 
 const ReactionTimeTest = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   
   const [phase, setPhase] = useState('pre'); // pre, active, result
@@ -260,12 +262,12 @@ const ReactionTimeTest = () => {
         <div className="max-w-2xl mx-auto mt-12">
           <InstructionCard
             icon={Zap}
-            title="Overview"
+            title={t('tests.overview')}
             instructions={
               <ul className="text-slate-300 space-y-2 list-disc pl-5">
-                <li>Click or tap the large box as quickly as you can <strong>when it turns green</strong>.</li>
-                <li>We will test your average reaction time over {TOTAL_ROUNDS} rounds.</li>
-                <li>Wait for the green! Clicking too early will result in a 500ms penalty on your average.</li>
+                <li>{t('tests.reactionTime.instructions.clickGreen')}</li>
+                <li>{t('tests.reactionTime.instructions.testRounds', { rounds: TOTAL_ROUNDS })}</li>
+                <li>{t('tests.reactionTime.instructions.waitGreen')}</li>
               </ul>
             }
           />
@@ -273,7 +275,7 @@ const ReactionTimeTest = () => {
             onClick={startTestSequence}
             className="w-full py-4 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-bold text-lg transition-transform hover:scale-[1.02] shadow-lg shadow-teal-500/20"
           >
-            Start Assessment →
+            {t('tests.startAssessment')} →
           </button>
         </div>
       )}
@@ -284,28 +286,28 @@ const ReactionTimeTest = () => {
           {/* Sidebar / Top bar for History */}
           <div className="w-full lg:w-64 bg-slate-900 rounded-2xl border border-slate-800 flex flex-col p-4 shrink-0 transition-all shadow-xl h-32 lg:h-full overflow-hidden">
              <div className="flex justify-between items-center mb-4">
-               <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">History</span>
-               <span className="text-sm font-black text-teal-400">Round {round + 1}/{TOTAL_ROUNDS}</span>
+               <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{t('tests.history')}</span>
+               <span className="text-sm font-black text-teal-400">{t('tests.round')} {round + 1}/{TOTAL_ROUNDS}</span>
              </div>
              <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar flex flex-row lg:flex-col gap-2 lg:gap-0">
-               {results.map((r, i) => (
-                 <div key={i} className={`flex items-center justify-between p-3 rounded-xl border shrink-0 min-w-[120px] lg:min-w-0 ${
-                   r.falseStart ? 'bg-red-500/10 border-red-500/30' : 'bg-slate-800/50 border-slate-700/50'
-                 }`}>
-                   <span className="text-xs font-bold text-slate-500 uppercase">R{i + 1}</span>
-                   <span className={`font-black ${r.falseStart ? 'text-red-400' : 'text-white'}`}>
-                     {r.falseStart ? 'Early!' : `${Math.round(r.rt)}ms`}
-                   </span>
-                 </div>
-               ))}
-               
-               {/* Placeholders for remaining rounds */}
-               {Array.from({ length: TOTAL_ROUNDS - results.length }).map((_, i) => (
-                 <div key={`empty-${i}`} className="flex items-center justify-between p-3 rounded-xl border border-slate-800 bg-slate-900/50 opacity-40 shrink-0 min-w-[120px] lg:min-w-0">
-                   <span className="text-xs font-bold text-slate-600 uppercase">R{results.length + i + 1}</span>
-                   <span className="font-bold text-slate-700">---</span>
-                 </div>
-               ))}
+                {results.map((r, i) => (
+                  <div key={i} className={`flex items-center justify-between p-3 rounded-xl border shrink-0 min-w-[120px] lg:min-w-0 ${
+                    r.falseStart ? 'bg-red-500/10 border-red-500/30' : 'bg-slate-800/50 border-slate-700/50'
+                  }`}>
+                    <span className="text-xs font-bold text-slate-500 uppercase">R{i + 1}</span>
+                    <span className={`font-black ${r.falseStart ? 'text-red-400' : 'text-white'}`}>
+                      {r.falseStart ? t('tests.early') : `${Math.round(r.rt)}ms`}
+                    </span>
+                  </div>
+                ))}
+                
+                {/* Placeholders for remaining rounds */}
+                {Array.from({ length: TOTAL_ROUNDS - results.length }).map((_, i) => (
+                  <div key={`empty-${i}`} className="flex items-center justify-between p-3 rounded-xl border border-slate-800 bg-slate-900/50 opacity-40 shrink-0 min-w-[120px] lg:min-w-0">
+                    <span className="text-xs font-bold text-slate-600 uppercase">R{results.length + i + 1}</span>
+                    <span className="font-bold text-slate-700">---</span>
+                  </div>
+                ))}
              </div>
           </div>
 
@@ -323,28 +325,28 @@ const ReactionTimeTest = () => {
             >
               {boxState === 'waiting' && (
                 <>
-                  <p className="text-3xl md:text-5xl font-black text-slate-500 mb-4 tracking-tight">Wait for green...</p>
-                  <p className="text-slate-600 font-medium tracking-wide">(Do not click yet)</p>
+                  <p className="text-3xl md:text-5xl font-black text-slate-500 mb-4 tracking-tight">{t('tests.waitForGreen')}</p>
+                  <p className="text-slate-600 font-medium tracking-wide">{t('tests.doNotClickYet')}</p>
                 </>
               )}
 
               {boxState === 'go' && (
                 <div className="animate-in zoom-in duration-75 text-center">
-                  <p className="text-6xl md:text-8xl font-black text-white tracking-tighter drop-shadow-xl uppercase">Click!</p>
+                  <p className="text-6xl md:text-8xl font-black text-white tracking-tighter drop-shadow-xl uppercase">{t('tests.click')}</p>
                 </div>
               )}
 
               {boxState === 'early' && (
                 <div className="animate-in slide-in-bottom-4 text-center">
                   <AlertCircle className="w-20 h-20 text-white/50 mx-auto mb-4" />
-                  <p className="text-4xl md:text-6xl font-black text-white tracking-tight uppercase">Too Early!</p>
-                  <p className="text-red-200 font-bold mt-4 tracking-widest uppercase">Penalty Applied</p>
+                  <p className="text-4xl md:text-6xl font-black text-white tracking-tight uppercase">{t('tests.tooEarly')}</p>
+                  <p className="text-red-200 font-bold mt-4 tracking-widest uppercase">{t('tests.penaltyApplied')}</p>
                 </div>
               )}
 
               {boxState === 'round_result' && (
                 <div className="animate-in fade-in text-center">
-                  <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Reaction Time</p>
+                  <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">{t('tests.reactionTimeLabel')}</p>
                   <p className="text-5xl md:text-7xl font-black text-white tracking-tight">{Math.round(lastRT)}ms</p>
                 </div>
               )}
@@ -357,16 +359,16 @@ const ReactionTimeTest = () => {
         <div className="max-w-5xl mx-auto mt-8 slide-in-bottom">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-4 bg-slate-900 rounded-[2rem] p-8 border border-slate-800 shadow-2xl flex flex-col items-center justify-center">
-              <h3 className="text-lg font-bold text-slate-300 mb-8 tracking-wide">Final Assessment</h3>
+              <h3 className="text-lg font-bold text-slate-300 mb-8 tracking-wide">{t('tests.finalAssessment')}</h3>
               <ScoreCircularGauge 
                 scoreStr={`${Math.round(testScoreData.finalRT)}ms`} 
                 percentage={testScoreData.pScore}
-                title="Avg Time"
+                title={t('tests.avgTime')}
               />
               
               <div className="mt-8 px-6 py-2 rounded-full bg-slate-800/50 border border-slate-700 w-full text-center">
                 <span className="text-sm font-bold text-white tracking-wide">
-                  Rating: <span className={
+                  {t('tests.rating')}: <span className={
                     testScoreData.rating === 'Superb' || testScoreData.rating === 'Excellent' ? 'text-teal-400' : 
                     testScoreData.rating === 'Good' || testScoreData.rating === 'Average' ? 'text-yellow-400' : 'text-red-400'
                   }>

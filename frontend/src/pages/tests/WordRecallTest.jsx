@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -79,6 +80,7 @@ const ScoreArc = ({ score, maxScore = 10 }) => {
 };
 
 const WordRecallTest = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [phase, setPhase] = useState('pre'); // pre, memorize, distraction, recall, result
   const [words, setWords] = useState([]);
@@ -290,17 +292,17 @@ const WordRecallTest = () => {
       <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <span className="inline-block px-3 py-1 bg-purple-600 text-white text-xs font-bold rounded-full tracking-wide mb-3 uppercase">
-            Memory
+            {t('tests.wordRecall.category')}
           </span>
-          <h1 className="text-3xl font-black text-white mb-1">Word Recall Test</h1>
+          <h1 className="text-3xl font-black text-white mb-1">{t('tests.wordRecall.title')}</h1>
           <p className="text-slate-400 font-medium tracking-wide">
-            Short-Term Memory Assessment: Evaluating immediate recall and cognitive interference resilience
+            {t('tests.wordRecall.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <div className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 flex items-center gap-2">
             <Timer className="w-4 h-4 text-purple-400" />
-            <span className="text-slate-300 text-sm font-semibold">~4 Minutes</span>
+            <span className="text-slate-300 text-sm font-semibold">{t('tests.wordRecall.duration')}</span>
           </div>
         </div>
       </div>
@@ -309,10 +311,10 @@ const WordRecallTest = () => {
         <div className="max-w-2xl mx-auto mt-12">
           <InstructionCard
             icon={BookOpen}
-            title="Overview"
+            title={t('tests.overview')}
             instructions={
               <p className="text-slate-300 space-y-3">
-                This test evaluates your short-term verbal memory. You will be shown a list of 10 words, one by one. Try to remember as many as you can. After a brief distraction task, you will be asked to recall the words.
+                {t('tests.wordRecall.instructions.overview')}
               </p>
             }
           />
@@ -320,16 +322,16 @@ const WordRecallTest = () => {
             onClick={() => setPhase('memorize')}
             className="w-full py-4 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-bold text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-purple-500/20"
           >
-            Start Assessment →
+            {t('tests.startAssessment')} →
           </button>
         </div>
       )}
 
       {phase === 'memorize' && (
         <div className="max-w-2xl mx-auto mt-12 flex flex-col items-center">
-          <p className="tracking-widest text-slate-400 font-bold mb-6 text-sm">PHASE 1: MEMORIZE</p>
+          <p className="tracking-widest text-slate-400 font-bold mb-6 text-sm">{t('tests.wordRecall.memorizePhase')}</p>
           <div className="bg-slate-900 rounded-[2rem] p-10 lg:p-14 w-full shadow-2xl border border-slate-800 text-center relative overflow-hidden min-h-[400px] flex flex-col justify-between">
-            <p className="text-slate-300 font-medium mb-8">Remember these words. They will be shown one at a time.</p>
+            <p className="text-slate-300 font-medium mb-8">{t('tests.wordRecall.memorizeInstructions')}</p>
             
             <div className="flex-1 flex flex-col justify-center items-center">
               <h2 
@@ -342,7 +344,7 @@ const WordRecallTest = () => {
 
             <div className="mt-8 w-full max-w-sm mx-auto">
               <p className="text-slate-400 text-sm mb-3 font-semibold tracking-wide">
-                {String(currentWordIndex + 1).padStart(2, '0')} / 10 Words Displayed
+                {String(currentWordIndex + 1).padStart(2, '0')} / 10 {t('tests.wordRecall.wordsDisplayed')}
               </p>
               <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
                 <div 
@@ -357,9 +359,9 @@ const WordRecallTest = () => {
 
       {phase === 'distraction' && (
         <div className="max-w-xl mx-auto mt-12 flex flex-col items-center">
-          <p className="tracking-widest text-slate-400 font-bold mb-6 text-sm">PHASE 2: DISTRACTION TASK</p>
+          <p className="tracking-widest text-slate-400 font-bold mb-6 text-sm">{t('tests.wordRecall.distractionPhase')}</p>
           <div className="bg-slate-900 rounded-[2rem] p-10 lg:p-14 w-full shadow-2xl border border-slate-800 text-center relative">
-            <p className="text-slate-300 font-medium mb-8 text-lg">Answer this math question before proceeding.</p>
+            <p className="text-slate-300 font-medium mb-8 text-lg">{t('tests.wordRecall.mathQuestion')}</p>
             
             <p className="text-5xl font-black text-white mb-8 tracking-widest">
               100 − 7
@@ -381,7 +383,7 @@ const WordRecallTest = () => {
                 <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-3">
                   <CheckCircle2 className="w-6 h-6 text-green-500" />
                 </div>
-                <p className="text-green-400 font-bold text-lg">Correct! Moving on...</p>
+                <p className="text-green-400 font-bold text-lg">{t('tests.wordRecall.correct')}</p>
               </div>
             )}
 
@@ -390,12 +392,12 @@ const WordRecallTest = () => {
                 <div className="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center mb-3">
                   <XCircle className="w-6 h-6 text-red-500" />
                 </div>
-                <p className="text-red-400 font-bold text-lg mb-6">The correct answer was 93.</p>
+                <p className="text-red-400 font-bold text-lg mb-6">{t('tests.wordRecall.correctAnswerWas', { answer: '93' })}</p>
                 <button
                   onClick={startRecall}
                   className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-colors"
                 >
-                  Continue Anyway
+                  {t('tests.wordRecall.continueAnyway')}
                 </button>
               </div>
             )}
@@ -405,7 +407,7 @@ const WordRecallTest = () => {
                 onClick={handleDistractionSubmit}
                 className="w-full max-w-[200px] py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-lg mt-4 transition-transform hover:scale-[1.02] active:scale-[0.98]"
               >
-                Submit Answer
+                {t('tests.wordRecall.submitAnswer')}
               </button>
             )}
           </div>
@@ -414,12 +416,12 @@ const WordRecallTest = () => {
 
       {phase === 'recall' && (
         <div className="max-w-3xl mx-auto mt-12 flex flex-col items-center">
-          <p className="tracking-widest text-slate-400 font-bold mb-6 text-sm">PHASE 3: RECALL</p>
+          <p className="tracking-widest text-slate-400 font-bold mb-6 text-sm">{t('tests.wordRecall.recallPhase')}</p>
           <div className="bg-slate-900 rounded-[2rem] p-8 lg:p-10 w-full shadow-2xl border border-slate-800 text-center relative flex flex-col lg:flex-row gap-8">
             
             <div className="flex-1 flex flex-col">
               <p className="text-slate-300 font-medium mb-8 text-left leading-relaxed">
-                Type as many words as you remember from the list. You have 60 seconds.
+                {t('tests.wordRecall.typeWords')}
               </p>
 
               <form onSubmit={handleAddWord} className="mb-6 flex gap-3">
@@ -429,20 +431,20 @@ const WordRecallTest = () => {
                   value={recallInput}
                   onChange={(e) => setRecallInput(e.target.value)}
                   className="flex-1 h-14 px-6 bg-slate-950 border-2 border-slate-800 rounded-2xl text-white text-xl font-medium focus:outline-none focus:border-purple-500 transition-colors"
-                  placeholder="Type a word and Event Enter..."
+                  placeholder={t('tests.wordRecall.typePlaceholder')}
                   autoComplete="off"
                 />
                 <button
                   type="submit"
                   className="px-6 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-bold text-sm transition-colors border border-slate-700"
                 >
-                  Add Word
+                  {t('tests.wordRecall.addWord')}
                 </button>
               </form>
 
               <div className="bg-slate-950/50 min-h-[160px] rounded-2xl p-6 border border-slate-800/50 flex flex-wrap gap-3 content-start">
                 {recalledWords.length === 0 && incorrectWords.length === 0 && (
-                  <p className="text-slate-500 italic w-full text-center mt-4">Submitted words will appear here...</p>
+                  <p className="text-slate-500 italic w-full text-center mt-4">{t('tests.wordRecall.submittedWordsAppear')}</p>
                 )}
                 {recalledWords.map((word, i) => (
                   <span key={`correct-${i}`} className="px-4 py-2 bg-green-500 text-white rounded-full font-bold shadow-lg shadow-green-500/20 text-sm animate-in scale-in duration-200">
@@ -459,7 +461,7 @@ const WordRecallTest = () => {
 
             <div className="w-full lg:w-48 flex flex-col gap-4 border-t border-slate-800 lg:border-t-0 lg:border-l lg:pl-8 pt-6 lg:pt-0">
               <div className="text-center bg-slate-950/50 rounded-2xl p-6 border border-slate-800/50 flex flex-col items-center">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Time Left</span>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{t('tests.wordRecall.timeLeft')}</span>
                 <span className={`text-4xl font-black tracking-tight ${timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-purple-400'}`}>
                   {formatTime(timeLeft)}
                 </span>
@@ -469,7 +471,7 @@ const WordRecallTest = () => {
                 onClick={handleFinishRecall}
                 className="w-full mt-auto py-4 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition-transform hover:scale-[1.02] shadow-lg text-sm tracking-wide border border-slate-700"
               >
-                Finish Early
+                {t('tests.wordRecall.finishEarly')}
               </button>
             </div>
             
@@ -481,13 +483,13 @@ const WordRecallTest = () => {
         <div className="max-w-5xl mx-auto mt-8 slide-in-bottom">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-4 bg-slate-900 rounded-[2rem] p-8 border border-slate-800 shadow-2xl flex flex-col items-center justify-center">
-              <h3 className="text-lg font-bold text-slate-300 mb-8">Test Results</h3>
+              <h3 className="text-lg font-bold text-slate-300 mb-8">{t('tests.results')}</h3>
               <ScoreArc score={score} maxScore={10} />
-              <p className="text-slate-400 font-medium mt-4">words recalled correctly</p>
+              <p className="text-slate-400 font-medium mt-4">{t('tests.wordRecall.wordsRecalledCorrectly')}</p>
               
               <div className="mt-8 px-6 py-2 rounded-full bg-slate-800/50 border border-slate-700 w-full text-center">
                 <span className="text-sm font-bold text-white tracking-wide">
-                  Rating: <span className={score >= 7 ? 'text-green-400' : score >= 5 ? 'text-yellow-400' : 'text-red-400'}>
+                  {t('tests.rating')}: <span className={score >= 7 ? 'text-green-400' : score >= 5 ? 'text-yellow-400' : 'text-red-400'}>
                     {getRating(score)}
                   </span>
                 </span>
@@ -499,13 +501,13 @@ const WordRecallTest = () => {
 
             <div className="lg:col-span-8 bg-slate-900 rounded-[2rem] p-8 border border-slate-800 shadow-xl flex flex-col">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-white mb-2">Original Word List</h3>
+                <h3 className="text-xl font-bold text-white mb-2">{t('tests.wordRecall.originalWordList')}</h3>
                 <div className="flex gap-4">
                   <span className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
-                    <div className="w-2 h-2 rounded-full bg-green-500"></div> Recalled
+                    <div className="w-2 h-2 rounded-full bg-green-500"></div> {t('tests.wordRecall.recalled')}
                   </span>
                   <span className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
-                    <div className="w-2 h-2 rounded-full bg-slate-600"></div> Missed
+                    <div className="w-2 h-2 rounded-full bg-slate-600"></div> {t('tests.wordRecall.missed')}
                   </span>
                 </div>
               </div>

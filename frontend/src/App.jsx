@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
-import CaregiverPortal from './pages/CaregiverPortal';
 import SpeechSession from './pages/SpeechSession';
 import FacialSession from './pages/FacialSession';
 import FacialReport from './pages/FacialReport';
@@ -13,53 +12,48 @@ import Medications from './pages/Medications';
 import Insights from './pages/Insights';
 import Profile from './pages/Profile';
 import TestsPage from './pages/TestsPage';
+import SettingsPage from './pages/Settings';
+import CaregiverLogin from './pages/caregiver/CaregiverLogin';
+import CaregiverSignup from './pages/caregiver/CaregiverSignup';
+import CaregiverDashboard from './pages/caregiver/CaregiverDashboard';
 import ClockDrawingTest from './pages/tests/ClockDrawingTest';
 import WordRecallTest from './pages/tests/WordRecallTest';
 import TrailMakingTest from './pages/tests/TrailMakingTest';
 import StroopTest from './pages/tests/StroopTest';
 import ReactionTimeTest from './pages/tests/ReactionTimeTest';
 import useAuthStore from './store/useAuthStore';
+import useCaregiverStore from './store/useCaregiverStore';
 
-const SettingsPage = () => (
-  <div className="min-h-screen bg-slate-950 pb-8">
-    <div className="bg-slate-900 p-6 border-b border-slate-800">
-      <h1 className="text-xl font-bold text-white">Settings</h1>
-      <p className="text-slate-400 text-sm mt-1">Application settings and preferences</p>
-    </div>
-    <div className="p-8 flex flex-col items-center justify-center">
-      <p className="text-slate-400 text-center">Settings coming soon</p>
-    </div>
-  </div>
-);
-
-const ExercisesPage = () => (
-  <div className="min-h-screen bg-slate-950 pb-8">
-    <div className="bg-slate-900 p-6 border-b border-slate-800">
-      <h1 className="text-xl font-bold text-white">Cognitive Exercises</h1>
-      <p className="text-slate-400 text-sm mt-1">Daily training modules for neuroplasticity</p>
-    </div>
-    <div className="p-8 flex flex-col items-center justify-center">
-      <p className="text-slate-400 text-center">Coming soon</p>
-    </div>
-  </div>
-);
-
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children, caregiverOnly = false }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isCaregiverAuthenticated = useCaregiverStore((s) => s.isAuthenticated);
   const location = useLocation();
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+  if (caregiverOnly) {
+    if (!isCaregiverAuthenticated) {
+      return <Navigate to="/caregiver/login" state={{ from: location }} replace />;
+    }
+  } else {
+    if (!isAuthenticated) {
+      return <Navigate to="/login" state={{ from: location }} replace />;
+    }
   }
 
   return children;
 }
 
-function PublicRoute({ children }) {
+function PublicRoute({ children, caregiverOnly = false }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isCaregiverAuthenticated = useCaregiverStore((s) => s.isAuthenticated);
 
-  if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+  if (caregiverOnly) {
+    if (isCaregiverAuthenticated) {
+      return <Navigate to="/caregiver" replace />;
+    }
+  } else {
+    if (isAuthenticated) {
+      return <Navigate to="/" replace />;
+    }
   }
 
   return children;
@@ -127,13 +121,6 @@ function App() {
             </Layout>
           </ProtectedRoute>
         } />
-        <Route path="/caregiver" element={
-          <ProtectedRoute>
-            <Layout showBottomNav={true}>
-              <CaregiverPortal />
-            </Layout>
-          </ProtectedRoute>
-        } />
         <Route path="/settings" element={
           <ProtectedRoute>
             <Layout showBottomNav={true}>
@@ -148,11 +135,20 @@ function App() {
             </Layout>
           </ProtectedRoute>
         } />
-        <Route path="/exercises" element={
-          <ProtectedRoute>
-            <Layout showBottomNav={true}>
-              <ExercisesPage />
-            </Layout>
+
+        <Route path="/caregiver/login" element={
+          <PublicRoute caregiverOnly>
+            <CaregiverLogin />
+          </PublicRoute>
+        } />
+        <Route path="/caregiver/signup" element={
+          <PublicRoute caregiverOnly>
+            <CaregiverSignup />
+          </PublicRoute>
+        } />
+        <Route path="/caregiver" element={
+          <ProtectedRoute caregiverOnly>
+            <CaregiverDashboard />
           </ProtectedRoute>
         } />
         

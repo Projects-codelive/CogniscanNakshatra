@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
   Timer,
@@ -67,6 +68,7 @@ const ScoreArc = ({ score, textOverride }) => {
 };
 
 const TrailMakingTest = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const canvasRef = useRef(null);
   
@@ -344,17 +346,17 @@ const TrailMakingTest = () => {
       <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <span className="inline-block px-3 py-1 bg-green-600 top-text-white text-xs font-bold rounded-full tracking-wide mb-3 uppercase">
-            Executive
+            {t('tests.trailMaking.category')}
           </span>
-          <h1 className="text-3xl font-black text-white mb-1">Trail Making Test</h1>
+          <h1 className="text-3xl font-black text-white mb-1">{t('tests.trailMaking.title')}</h1>
           <p className="text-slate-400 font-medium tracking-wide">
-            Visual-Motor Assessment: Evaluating visual scanning, processing speed, and cognitive flexibility
+            {t('tests.trailMaking.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <div className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2 flex items-center gap-2">
             <Timer className="w-4 h-4 text-green-400" />
-            <span className="text-slate-300 text-sm font-semibold">~2 Minutes</span>
+            <span className="text-slate-300 text-sm font-semibold">{t('tests.trailMaking.duration')}</span>
           </div>
         </div>
       </div>
@@ -363,12 +365,12 @@ const TrailMakingTest = () => {
         <div className="max-w-2xl mx-auto mt-12">
           <InstructionCard
             icon={Footprints}
-            title="Overview"
+            title={t('tests.overview')}
             instructions={
               <p className="text-slate-300 space-y-3 leading-relaxed">
-                You will see a series of circles numbered 1 to 10. Tap them in sequential order (1, then 2, then 3...) as quickly as possible.
+                {t('tests.trailMaking.instructions.overview')}
                 <br /><br />
-                <strong>Note:</strong> Errors will incur a 3-second time penalty. Try to be both fast and accurate.
+                <strong>{t('tests.trailMaking.instructions.note')}:</strong> {t('tests.trailMaking.instructions.penalty')}
               </p>
             }
           />
@@ -376,7 +378,7 @@ const TrailMakingTest = () => {
             onClick={() => setPhase('test')}
             className="w-full py-4 bg-green-600 hover:bg-green-500 text-white rounded-xl font-bold text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-green-500/20"
           >
-            Start Assessment →
+            {t('tests.startAssessment')} →
           </button>
         </div>
       )}
@@ -386,15 +388,15 @@ const TrailMakingTest = () => {
           
           <div className="w-full grid grid-cols-3 gap-4 mb-6">
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 text-center">
-              <span className="text-xs text-slate-500 uppercase font-bold tracking-widest block mb-1">Current Target</span>
+              <span className="text-xs text-slate-500 uppercase font-bold tracking-widest block mb-1">{t('tests.trailMaking.currentTarget')}</span>
               <span className="text-2xl font-black text-blue-400">{expectedNext > 10 ? '-' : expectedNext}</span>
             </div>
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 text-center">
-              <span className="text-xs text-slate-500 uppercase font-bold tracking-widest block mb-1">Errors</span>
+              <span className="text-xs text-slate-500 uppercase font-bold tracking-widest block mb-1">{t('tests.trailMaking.errors')}</span>
               <span className={`text-2xl font-black ${errorCount > 0 ? 'text-red-400' : 'text-slate-300'}`}>{errorCount}</span>
             </div>
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 text-center">
-              <span className="text-xs text-slate-500 uppercase font-bold tracking-widest block mb-1">Time</span>
+              <span className="text-xs text-slate-500 uppercase font-bold tracking-widest block mb-1">{t('tests.time')}</span>
               <span className="text-2xl font-black text-white">{(currentTimeMs / 1000).toFixed(1)}s</span>
             </div>
           </div>
@@ -410,7 +412,7 @@ const TrailMakingTest = () => {
             />
           </div>
           <p className="text-slate-400 text-sm mt-6 font-medium bg-slate-900/50 px-4 py-2 rounded-full border border-slate-800">
-            Tap circles in sequence: 1 → 2 → 3 → ...
+            {t('tests.trailMaking.tapCircles')}
           </p>
         </div>
       )}
@@ -419,13 +421,13 @@ const TrailMakingTest = () => {
         <div className="max-w-5xl mx-auto mt-8 slide-in-bottom">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-4 bg-slate-900 rounded-[2rem] p-8 border border-slate-800 shadow-2xl flex flex-col items-center justify-center">
-              <h3 className="text-lg font-bold text-slate-300 mb-8">Test Time</h3>
+              <h3 className="text-lg font-bold text-slate-300 mb-8">{t('tests.trailMaking.testTime')}</h3>
               <ScoreArc score={scoreData.finalScore} textOverride={`${scoreData.totalTime}s`} />
-              <p className="text-slate-400 font-medium mt-4">Total adjusted time</p>
+              <p className="text-slate-400 font-medium mt-4">{t('tests.trailMaking.totalAdjustedTime')}</p>
               
               <div className="mt-8 px-6 py-2 rounded-full bg-slate-800/50 border border-slate-700 w-full text-center">
                 <span className="text-sm font-bold text-white tracking-wide">
-                  Rating: <span className={
+                  {t('tests.rating')}: <span className={
                     scoreData.rating === 'Excellent' ? 'text-green-400' : 
                     scoreData.rating === 'Good' ? 'text-green-300' : 
                     scoreData.rating === 'Moderate' ? 'text-yellow-400' : 'text-red-400'
@@ -438,13 +440,13 @@ const TrailMakingTest = () => {
 
             <div className="lg:col-span-8 bg-slate-900 rounded-[2rem] p-8 border border-slate-800 shadow-xl flex flex-col justify-between">
               <div>
-                <h3 className="text-xl font-bold text-white mb-6">Performance Breakdown</h3>
+                <h3 className="text-xl font-bold text-white mb-6">{t('tests.trailMaking.performanceBreakdown')}</h3>
                 
                 <div className="space-y-4">
                   <div className="flex justify-between items-center p-4 bg-slate-950 rounded-xl border border-slate-800">
                     <div className="flex items-center gap-3">
                       <Timer className="w-5 h-5 text-slate-400" />
-                      <span className="font-medium text-slate-300">Raw Completion Time</span>
+                      <span className="font-medium text-slate-300">{t('tests.trailMaking.rawTime')}</span>
                     </div>
                     <span className="text-xl font-bold text-white">{scoreData.rawTime}s</span>
                   </div>
@@ -452,13 +454,13 @@ const TrailMakingTest = () => {
                   <div className="flex justify-between items-center p-4 bg-slate-950 rounded-xl border border-slate-800">
                     <div className="flex items-center gap-3">
                       <AlertCircle className="w-5 h-5 text-red-400" />
-                      <span className="font-medium text-slate-300">Error Penalty ({errorCount} errors × 3s)</span>
+                      <span className="font-medium text-slate-300">{t('tests.trailMaking.errorPenalty', { count: errorCount })}</span>
                     </div>
                     <span className="text-xl font-bold text-red-400">+{scoreData.errorPenalty}s</span>
                   </div>
                   
                   <div className="flex justify-between items-center p-4 bg-slate-800 rounded-xl border border-slate-700">
-                    <span className="font-bold text-white uppercase tracking-wider text-sm mt-1">Total Adjusted Time</span>
+                    <span className="font-bold text-white uppercase tracking-wider text-sm mt-1">{t('tests.trailMaking.totalAdjustedTime')}</span>
                     <span className="text-2xl font-black text-white">{scoreData.totalTime}s</span>
                   </div>
                 </div>

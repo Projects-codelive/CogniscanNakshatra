@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowLeft,
   Timer,
@@ -85,6 +86,7 @@ const ScoreCircularGauge = ({ score, subtitle }) => {
 };
 
 const StroopTest = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   
   const [phase, setPhase] = useState('pre'); // pre, countdown, practice, test, result
@@ -234,21 +236,21 @@ const StroopTest = () => {
         <div className="max-w-2xl mx-auto mt-12">
           <InstructionCard
             icon={Palette}
-            title="Instructions"
+            title={t('tests.instructions')}
             instructions={
               <div className="text-slate-300 space-y-4">
                 <p>
-                  You will see a word that names a color (e.g., "RED"), but it will be printed in a different <strong>ink color</strong> (e.g., blue ink).
+                  {t('tests.stroop.instructions.seeWord')}
                 </p>
                 <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 flex items-center gap-6">
                   <span className="text-3xl font-black tracking-widest" style={{ color: '#3b82f6' }}>RED</span>
                   <div className="flex-1">
-                    <p className="text-sm">The word says "RED", but the ink is <strong className="text-blue-400">BLUE</strong>.</p>
-                    <p className="text-sm font-bold text-white mt-1">You must select the button for BLUE.</p>
+                    <p className="text-sm">{t('tests.stroop.instructions.wordSaysBut')}</p>
+                    <p className="text-sm font-bold text-white mt-1">{t('tests.stroop.instructions.selectButton')}</p>
                   </div>
                 </div>
                 <p>
-                  Select the button that matches the INK COLOR, not the word. We will do 3 practice rounds first.
+                  {t('tests.stroop.instructions.selectInkColor')}
                 </p>
               </div>
             }
@@ -257,14 +259,14 @@ const StroopTest = () => {
             onClick={() => startPhase('practice')}
             className="w-full py-4 bg-orange-600 hover:bg-orange-500 text-white rounded-xl font-bold text-lg transition-transform hover:scale-[1.02] shadow-lg shadow-orange-500/20"
           >
-            Start Practice →
+            {t('tests.stroop.startPractice')} →
           </button>
         </div>
       )}
 
       {phase === 'countdown' && (
         <div className="flex flex-col items-center justify-center min-h-[50vh]">
-          <span className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Get Ready</span>
+          <span className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">{t('tests.stroop.getReady')}</span>
           <div className="text-8xl font-black text-orange-400 animate-pulse">
             {countdown}
           </div>
@@ -276,13 +278,13 @@ const StroopTest = () => {
           <div className="w-full flex justify-between items-center mb-12 bg-slate-900 p-4 rounded-2xl border border-slate-800">
             <div className="flex items-center gap-3">
               {phase === 'practice' ? (
-                <span className="px-3 py-1 rounded-md bg-yellow-500/20 text-yellow-400 text-xs font-bold uppercase tracking-wider">Practice Mode</span>
+                <span className="px-3 py-1 rounded-md bg-yellow-500/20 text-yellow-400 text-xs font-bold uppercase tracking-wider">{t('tests.stroop.practiceMode')}</span>
               ) : (
-                <span className="px-3 py-1 rounded-md bg-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider">Live Test</span>
+                <span className="px-3 py-1 rounded-md bg-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider">{t('tests.stroop.liveTest')}</span>
               )}
             </div>
             <span className="font-mono text-slate-400 font-medium">
-              Round {currentTrialIndex + 1} / {phase === 'practice' ? numPracticeTrials : numRealTrials}
+              {t('tests.stroop.round')} {currentTrialIndex + 1} / {phase === 'practice' ? numPracticeTrials : numRealTrials}
             </span>
           </div>
 
@@ -331,15 +333,15 @@ const StroopTest = () => {
             <div className="lg:col-span-4 flex flex-col gap-6">
               
               <div className="bg-slate-900 rounded-[2rem] p-8 border border-slate-800 shadow-2xl flex flex-col items-center justify-center">
-                <h3 className="text-lg font-bold text-slate-300 mb-6">Accuracy</h3>
+                <h3 className="text-lg font-bold text-slate-300 mb-6">{t('tests.stroop.accuracy')}</h3>
                 <ScoreCircularGauge 
                   score={Math.round((results.filter(r => r.correct).length / numRealTrials) * 100)} 
-                  subtitle="Correct" 
+                  subtitle={t('tests.correct')} 
                 />
               </div>
 
               <div className="bg-slate-900 rounded-[2rem] p-8 border border-slate-800 shadow-xl flex flex-col items-center justify-center">
-                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Average Reaction Time</h3>
+                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">{t('tests.stroop.averageReactionTime')}</h3>
                 <div className="text-4xl font-black text-white">
                   {Math.round(results.reduce((sum, r) => sum + r.reactionTime, 0) / results.length)}<span className="text-xl text-slate-500 ml-1">ms</span>
                 </div>
@@ -348,17 +350,17 @@ const StroopTest = () => {
             </div>
 
             <div className="lg:col-span-8 bg-slate-900 rounded-[2rem] p-8 border border-slate-800 shadow-xl flex flex-col">
-              <h3 className="text-xl font-bold text-white mb-6">Trial Breakdown</h3>
+              <h3 className="text-xl font-bold text-white mb-6">{t('tests.stroop.trialBreakdown')}</h3>
               
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b-2 border-slate-800/50">
                       <th className="pb-3 text-xs font-bold text-slate-500 uppercase">#</th>
-                      <th className="pb-3 text-xs font-bold text-slate-500 uppercase">Word Seen</th>
-                      <th className="pb-3 text-xs font-bold text-slate-500 uppercase">Ink Color</th>
-                      <th className="pb-3 text-xs font-bold text-slate-500 uppercase">Chosen</th>
-                      <th className="pb-3 text-xs font-bold text-slate-500 uppercase text-right">RT</th>
+                      <th className="pb-3 text-xs font-bold text-slate-500 uppercase">{t('tests.stroop.wordSeen')}</th>
+                      <th className="pb-3 text-xs font-bold text-slate-500 uppercase">{t('tests.stroop.inkColor')}</th>
+                      <th className="pb-3 text-xs font-bold text-slate-500 uppercase">{t('tests.stroop.chosen')}</th>
+                      <th className="pb-3 text-xs font-bold text-slate-500 uppercase text-right">{t('tests.stroop.rt')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/30">
