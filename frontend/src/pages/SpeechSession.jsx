@@ -18,16 +18,14 @@ import {
   RotateCcw,
   Upload
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../store/useAppStore';
 import ResultAnalysisPanel from '../components/ResultAnalysisPanel';
 import { getLastSpeechSession, addSpeechSession, getSpeechSessions } from '../store/db';
 import axios from 'axios';
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/api/speech`;
+const API_BASE_URL = 'http://localhost:8000/api/speech';
 
 const SpeechSession = () => {
-  const { t } = useTranslation();
   const [sessionStatus, setSessionStatus] = useState('idle');
   const [taskProgress, setTaskProgress] = useState(68);
   const [sessionTimer] = useState(252);
@@ -155,7 +153,7 @@ const SpeechSession = () => {
     
     if (!hasAudioContent && !hasTranscript) {
       setSessionStatus('idle');
-      alert(t('speech.speakMicrophone'));
+      alert('Please speak into the microphone before submitting. No audio was detected.');
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
       if (audioContextRef.current) audioContextRef.current.close();
       return;
@@ -193,8 +191,8 @@ const SpeechSession = () => {
     try {
       const formData = new FormData();
       formData.append('patient_id', patientId);
-      formData.append('transcript', actualTranscript || t('speech.noSpeechDetected'));
-      formData.append('prompt_text', t('speech.promptText'));
+      formData.append('transcript', actualTranscript || 'No speech detected.');
+      formData.append('prompt_text', 'Describe a peaceful afternoon in a garden you remember from your childhood.');
       
       if (hasAudio) {
         formData.append('audio', audioToUse, 'recording.webm');
@@ -587,10 +585,10 @@ const SpeechSession = () => {
   };
 
   const processingSteps = [
-    { title: t('speech.audioFingerprinting'), status: isAnalyzing || sessionStatus === 'completed' ? 'completed' : 'pending' },
-    { title: t('speech.semanticParsing'), status: isAnalyzing || sessionStatus === 'completed' ? 'completed' : 'pending' },
-    { title: t('speech.paralinguisticAnalysis'), status: isAnalyzing ? 'processing' : sessionStatus === 'completed' ? 'completed' : 'pending' },
-    { title: t('speech.cognitiveLoadScore'), status: sessionStatus === 'completed' ? 'completed' : isAnalyzing ? 'processing' : 'pending' },
+    { title: "Audio Fingerprinting", status: isAnalyzing || sessionStatus === 'completed' ? 'completed' : 'pending' },
+    { title: "Semantic Parsing", status: isAnalyzing || sessionStatus === 'completed' ? 'completed' : 'pending' },
+    { title: "Paralinguistic Analysis", status: isAnalyzing ? 'processing' : sessionStatus === 'completed' ? 'completed' : 'pending' },
+    { title: "Cognitive Load Score", status: sessionStatus === 'completed' ? 'completed' : isAnalyzing ? 'processing' : 'pending' },
   ];
 
   return (
@@ -606,18 +604,18 @@ const SpeechSession = () => {
 
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div>
-          <h1 className="text-3xl font-black text-white mb-2 uppercase tracking-tight">{t('speech.title')}</h1>
+          <h1 className="text-3xl font-black text-white mb-2 uppercase tracking-tight">Speech Analysis</h1>
           <p className="text-slate-400 text-sm max-w-xl leading-relaxed">
-            {t('speech.subtitle')}
+            Cognitive linguistic screening in progress. Speak clearly and follow the curator's prompts for optimal diagnostic fidelity.
           </p>
         </div>
         <div className="flex gap-4">
           <div className="bg-slate-900/50 border border-slate-800 p-4 rounded-2xl min-w-[120px] text-center">
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{t('speech.sessionTimer')}</p>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Session Timer</p>
             <p className="text-xl font-bold text-white tabular-nums">{formatTime(sessionTimer)}</p>
           </div>
           <div className="bg-slate-900/50 border border-slate-800 p-4 rounded-2xl min-w-[120px] text-center">
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{t('speech.studyProgress')}</p>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Study Progress</p>
             <p className="text-xl font-bold text-blue-500 transition-all">{taskProgress}%</p>
           </div>
         </div>
@@ -627,9 +625,9 @@ const SpeechSession = () => {
         <div className="lg:col-span-8 space-y-8">
           <div className="bg-[#1e293b] p-8 rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden">
             <div className={`mb-12 transition-all duration-500 ${sessionStatus === 'completed' ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
-              <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-4 block">{t('speech.digitalCurator')}</span>
+              <span className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-4 block">The Digital Curator</span>
               <h2 className="text-2xl font-bold text-white leading-relaxed max-w-2xl">
-                "{t('speech.promptText')}"
+                "Describe a peaceful afternoon in a garden you remember from your childhood."
               </h2>
               <div className="w-16 h-1 bg-blue-600 mt-6 rounded-full" />
             </div>
@@ -645,7 +643,7 @@ const SpeechSession = () => {
                       <Square size={32} className="text-white fill-white" />
                     </button>
                   </div>
-                  <p className="mt-8 text-[10px] font-black text-red-500 uppercase tracking-widest animate-pulse">{t('speech.liveAudioCapture')}</p>
+                  <p className="mt-8 text-[10px] font-black text-red-500 uppercase tracking-widest animate-pulse">Live Audio Capture</p>
                 </div>
               )}
 
@@ -654,7 +652,7 @@ const SpeechSession = () => {
                   <button onClick={startRecording} className="w-20 h-20 bg-blue-600 hover:bg-blue-500 rounded-3xl flex items-center justify-center shadow-2xl shadow-blue-900/40 hover:scale-110 active:scale-95 transition-all">
                     <Mic size={32} className="text-white" />
                   </button>
-                  <p className="mt-8 text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('speech.tapToStartResponse')}</p>
+                  <p className="mt-8 text-[10px] font-black text-slate-500 uppercase tracking-widest">Tap to start response</p>
                 </div>
               )}
 
@@ -664,8 +662,8 @@ const SpeechSession = () => {
                     <Loader2 size={48} className="text-blue-500 animate-spin" />
                     <div className="absolute top-0 left-0 w-full h-full border-4 border-blue-500/10 rounded-full" />
                   </div>
-                  <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest animate-pulse">{t('speech.runningNeuralInference')}</p>
-                  <p className="mt-4 text-xs text-slate-500 font-medium italic">{t('speech.analyzingCognitive')}</p>
+                  <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest animate-pulse">Running Neural Inference</p>
+                  <p className="mt-4 text-xs text-slate-500 font-medium italic">Analyzing cognitive markers...</p>
                 </div>
               )}
 
@@ -674,17 +672,17 @@ const SpeechSession = () => {
                   <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6 border border-emerald-500/20">
                     <CheckCircle2 size={32} className="text-emerald-500" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-4">{t('speech.analysisComplete')}</h3>
+                  <h3 className="text-xl font-bold text-white mb-4">Analysis Complete</h3>
                   <p className="text-sm text-slate-400 mb-6 max-w-md">
-                    {t('speech.viewDetailedReport')}
+                    Your speech has been analyzed. View the detailed cognitive report below.
                   </p>
                   <div className="flex gap-4">
                     <button onClick={resetSession} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition-all border border-slate-700 flex items-center gap-2">
                       <RotateCcw size={16} />
-                      {t('speech.retake')}
+                      Retake
                     </button>
                     <button onClick={() => setShowAnalysisPanel(true)} className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-blue-900/30 flex items-center gap-2 group">
-                      {t('speech.viewFullReport')}
+                      View Full Report
                       <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                     </button>
                   </div>
@@ -695,7 +693,7 @@ const SpeechSession = () => {
             <div className={`grid grid-cols-2 gap-4 transition-all duration-700 ${sessionStatus === 'recording' || sessionStatus === 'completed' ? 'opacity-100 translate-y-0' : 'opacity-20 translate-y-4 pointer-events-none'}`}>
               <div className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 group hover:border-slate-700 transition-colors">
                 <div className="flex justify-between items-start mb-4">
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('speech.toneStability')}</p>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tone Stability</p>
                   <BarChart2 size={16} className="text-emerald-500" />
                 </div>
                 <div className="flex items-baseline gap-2">
@@ -710,12 +708,12 @@ const SpeechSession = () => {
 
               <div className="bg-slate-900/50 p-6 rounded-2xl border border-slate-800 group hover:border-slate-700 transition-colors">
                 <div className="flex justify-between items-start mb-4">
-                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('speech.fillerWords')}</p>
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Filler Words</p>
                   <TrendingDown size={16} className="text-blue-400" />
                 </div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-2xl font-bold text-white">{fillerCount}</span>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">{t('speech.detected')}</span>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">detected</span>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-1">
                   {Array.from({ length: Math.min(fillerCount, 10) }).map((_, i) => (
@@ -729,7 +727,7 @@ const SpeechSession = () => {
 
         <div className="lg:col-span-4 space-y-8">
           <div className="bg-[#1e293b] p-6 rounded-3xl border border-slate-800 shadow-xl">
-            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">{t('speech.pipelineStatus')}</h3>
+            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">Pipeline Status</h3>
             <div className="space-y-6">
               {processingSteps.map((step, idx) => (
                 <div key={idx} className="flex items-center gap-4 group">
@@ -752,15 +750,15 @@ const SpeechSession = () => {
           <div className="relative rounded-3xl overflow-hidden aspect-square border border-slate-800 group cursor-pointer">
             <img 
               src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800" 
-              alt={t('speech.diagnosticVisualization')} 
+              alt="Diagnostic Visualization" 
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent flex items-end p-6">
               <div>
                 <div className="bg-blue-600 px-3 py-1 rounded-full text-[10px] font-black uppercase text-white tracking-widest mb-2 inline-block shadow-lg">
-                  {t('speech.aiCoreActive')}
+                  AI Core Active
                 </div>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t('speech.diagnosticFidelity')}: 98.4%</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Diagnostic Fidelity: 98.4%</p>
               </div>
             </div>
           </div>
@@ -768,23 +766,23 @@ const SpeechSession = () => {
           <div className="bg-red-500/5 border border-red-500/20 p-6 rounded-3xl group hover:bg-red-500/10 transition-colors">
              <div className="flex items-center gap-3 mb-4">
                <AlertTriangle className="text-red-500" size={18} />
-               <h3 className="text-sm font-bold text-red-500 uppercase tracking-tight">{t('speech.clinicianOverride')}</h3>
+               <h3 className="text-sm font-bold text-red-500 uppercase tracking-tight">Clinician Override</h3>
              </div>
              <p className="text-xs text-red-200/60 leading-relaxed mb-6">
-               {t('speech.subjectFatigue')}
+               Subject exhibits signs of cognitive fatigue. Activate override to suspend diagnostics.
              </p>
              <button className="w-full py-4 bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-red-500/20 active:scale-95">
-               {t('speech.triggerProtocol')}
+               Trigger Protocol
              </button>
           </div>
         </div>
       </div>
 
       <footer className="pt-8 border-t border-slate-800 flex justify-between items-center opacity-40">
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em]">{t('speech.secureMedicalProtocol')}</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em]">V8.2 Secure Medical Protocol</p>
         <div className="flex gap-6">
-          <button className="text-[10px] font-bold uppercase tracking-[0.2em] hover:opacity-100 transition-opacity">{t('speech.privacyPolicy')}</button>
-          <button className="text-[10px] font-bold uppercase tracking-[0.2em] hover:opacity-100 transition-opacity">{t('speech.emergencyHelpline')}</button>
+          <button className="text-[10px] font-bold uppercase tracking-[0.2em] hover:opacity-100 transition-opacity">Privacy Policy</button>
+          <button className="text-[10px] font-bold uppercase tracking-[0.2em] hover:opacity-100 transition-opacity">Emergency Helpline</button>
         </div>
       </footer>
     </div>
