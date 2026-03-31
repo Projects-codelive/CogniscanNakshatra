@@ -273,58 +273,76 @@ export default function Profile() {
     if (!user?.email) return;
     setIsProcessing(true);
     
-    await new Promise(r => setTimeout(r, 500));
-    
     try {
-      const db = window.indexedDB ? window.indexedDB.open('nakshatra-db', 1) : null;
-      if (db) {
-        db.onsuccess = () => {
-          const database = db.result;
-          const stores = ['testResults', 'checkIns', 'speechSessions', 'facialSessions', 'medicationLogs'];
-          stores.forEach(storeName => {
-            if (database.objectStoreNames.contains(storeName)) {
-              const transaction = database.transaction([storeName], 'readwrite');
-              const store = transaction.objectStore(storeName);
-              store.clear();
-            }
-          });
-        };
-      }
+      const { db } = await import('../store/db');
       
-      const storedUser = localStorage.getItem(`nakshatra-user-${user.email}`);
+      await Promise.all([
+        db.checkIns.clear(),
+        db.testResults.clear(),
+        db.medications.clear(),
+        db.speechSessions.clear(),
+        db.facialSessions.clear(),
+      ]);
+      
+      const userKey = `nakshatra-user-${user.email}`;
+      const storedUser = localStorage.getItem(userKey);
       if (storedUser) {
         const userData = JSON.parse(storedUser);
-        delete userData.cogniScore;
-        delete userData.streak;
-        delete userData.testResults;
-        delete userData.checkIns;
-        delete userData.speechSessions;
-        delete userData.facialSessions;
-        delete userData.shareCode;
-        delete userData.linkedCaregivers;
-        userData.cogniScore = 0;
-        userData.streak = 0;
-        localStorage.setItem(`nakshatra-user-${user.email}`, JSON.stringify(userData));
+        const newUserData = {
+          ...userData,
+          cogniScore: 0,
+          streak: 0,
+          testResults: [],
+          checkIns: [],
+          speechSessions: [],
+          facialSessions: [],
+          medicationLogs: [],
+          shareCode: null,
+          linkedCaregivers: [],
+          lastCheckin: null,
+          cogniTrend: 0,
+          weeklyData: [],
+          testsCompleted: 0,
+          checkinsCompleted: 0,
+          medicationAdherence: 0,
+          alerts: [],
+          aiInsight: '',
+          speechScore: 0,
+          memoryScore: 0,
+          attentionScore: 0,
+        };
+        localStorage.setItem(userKey, JSON.stringify(newUserData));
       }
       
-      const { setCogniScore, setStreak } = useAppStore.getState();
-      setCogniScore(0);
-      setStreak(0);
-      
-      setTestResults([]);
-      setCheckIns([]);
-      setShareCode('');
-      setLinkedCaregivers([]);
+      localStorage.removeItem('nakshatra-app');
       
       setShowResetModal(false);
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 2000);
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       console.error('Error resetting data:', error);
       setError(t('profile.errors.resetFailed'));
+      setIsProcessing(false);
     }
-    
-    setIsProcessing(false);
+  };
+        localStorage.setItem(userKey, JSON.stringify(newUserData));
+      }
+      
+      localStorage.removeItem('nakshatra-app');
+      setShowResetModal(false);
+      setSuccess(true);
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    } catch (error) {
+      console.error('Error resetting data:', error);
+      setError(t('profile.errors.resetFailed'));
+      setIsProcessing(false);
+    }
   };
 
   const tabs = [
