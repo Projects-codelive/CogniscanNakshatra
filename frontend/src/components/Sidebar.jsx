@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { 
   LayoutDashboard, 
   Activity,
-  Settings,
   LogOut, 
   ChevronRight,
   ChevronDown,
@@ -81,7 +80,6 @@ const Sidebar = () => {
       label: t('nav.system'),
       items: [
         { id: 'profile', label: t('nav.profile'), path: '/profile', icon: User },
-        { id: 'settings', label: t('nav.settings'), path: '/settings', icon: Settings },
       ]
     },
   ];

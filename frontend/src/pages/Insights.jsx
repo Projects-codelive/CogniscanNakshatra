@@ -173,18 +173,18 @@ export default function Insights() {
   };
 
   const memoryTrend = getTrend(
-    riskData?.trends?.memory?.current || latestByType('word-recall')?.score || 70,
-    riskData?.baseline?.memoryScore || 70
+    riskData?.trends?.memory?.current || latestByType('word-recall')?.score || 0,
+    riskData?.baseline?.memoryScore || 0
   );
   
   const reactionTrend = getTrend(
-    riskData?.trends?.reaction?.current || latestByType('reaction-time')?.score || 70,
-    riskData?.baseline?.reactionScore || 70
+    riskData?.trends?.reaction?.current || latestByType('reaction-time')?.score || 0,
+    riskData?.baseline?.reactionScore || 0
   );
 
   const wellbeingTrend = getTrend(
-    riskData?.trends?.wellbeing?.current || weekly?.avgMood * 20 || 70,
-    riskData?.baseline?.wellbeingScore || 70
+    riskData?.trends?.wellbeing?.current || weekly?.avgMood * 20 || 0,
+    riskData?.baseline?.wellbeingScore || 0
   );
 
   return (

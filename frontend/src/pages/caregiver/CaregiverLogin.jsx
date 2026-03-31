@@ -15,7 +15,7 @@ export default function CaregiverLogin() {
   const handleLogin = async () => {
     setError('');
     if (!email || !password) {
-      setError('Please fill in all fields');
+      setError(t('login.errors.enterCredentials'));
       return;
     }
 
@@ -24,14 +24,14 @@ export default function CaregiverLogin() {
 
     const storedCaregiver = localStorage.getItem(`nakshatra-caregiver-${email}`);
     if (!storedCaregiver) {
-      setError('No account found with this email');
+      setError(t('login.errors.noAccount'));
       setIsLoading(false);
       return;
     }
 
     const caregiverData = JSON.parse(storedCaregiver);
     if (caregiverData.password !== password) {
-      setError('Incorrect password');
+      setError(t('login.errors.incorrectPassword'));
       setIsLoading(false);
       return;
     }
@@ -52,8 +52,8 @@ export default function CaregiverLogin() {
           <div className="w-16 h-16 bg-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <ShieldCheck className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white">Caregiver Portal</h1>
-          <p className="text-slate-400 mt-2">Monitor your loved one's health</p>
+          <h1 className="text-2xl font-bold text-white">{t('caregiver.caregiverPortal')}</h1>
+          <p className="text-slate-400 mt-2">{t('caregiver.monitorLovedOne')}</p>
         </div>
 
         <div className="bg-slate-900 rounded-2xl p-6 border border-slate-800">
@@ -92,20 +92,20 @@ export default function CaregiverLogin() {
               disabled={isLoading}
               className="w-full h-12 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl font-bold transition-colors flex items-center justify-center gap-2"
             >
-              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Sign In'}
+              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : t('caregiver.signIn')}
             </button>
 
             <p className="text-center text-slate-400 text-sm">
-              New caregiver?{' '}
+              {t('caregiver.newCaregiver')}{' '}
               <Link to="/caregiver/signup" className="text-emerald-400 font-medium hover:underline">
-                Create account
+                {t('caregiver.createAccount')}
               </Link>
             </p>
           </div>
         </div>
 
         <p className="text-center text-slate-600 text-xs mt-6">
-          <Link to="/login" className="hover:text-slate-400">Patient login</Link>
+          <Link to="/login" className="hover:text-slate-400">{t('caregiver.patientLogin')}</Link>
         </p>
       </div>
     </div>

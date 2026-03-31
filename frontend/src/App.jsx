@@ -12,7 +12,6 @@ import Medications from './pages/Medications';
 import Insights from './pages/Insights';
 import Profile from './pages/Profile';
 import TestsPage from './pages/TestsPage';
-import SettingsPage from './pages/Settings';
 import CaregiverLogin from './pages/caregiver/CaregiverLogin';
 import CaregiverSignup from './pages/caregiver/CaregiverSignup';
 import CaregiverDashboard from './pages/caregiver/CaregiverDashboard';
@@ -118,13 +117,6 @@ function App() {
           <ProtectedRoute>
             <Layout showBottomNav={true}>
               <Insights />
-            </Layout>
-          </ProtectedRoute>
-        } />
-        <Route path="/settings" element={
-          <ProtectedRoute>
-            <Layout showBottomNav={true}>
-              <SettingsPage />
             </Layout>
           </ProtectedRoute>
         } />

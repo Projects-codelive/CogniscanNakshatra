@@ -8,9 +8,9 @@ export const useAppStore = create(
       setActiveTab: (tab) => set({ activeTab: tab }),
       isSidebarOpen: true,
       toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
-      cogniScore: 72,
+      cogniScore: 0,
       setCogniScore: (score) => set({ cogniScore: score }),
-      streak: 5,
+      streak: 0,
       setStreak: (streak) => set({ streak }),
     }),
     {

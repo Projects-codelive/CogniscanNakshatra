@@ -11,7 +11,6 @@ import {
   MoreHorizontal,
   X,
   ChevronRight,
-  Settings,
   BarChart3,
   Pill,
   FileText,
@@ -75,15 +74,6 @@ const BottomNav = () => {
       path: '/insights', 
       icon: BarChart3,
       color: 'bg-blue-500',
-    },
-
-    { 
-      id: 'settings', 
-      label: t('nav.settings'), 
-      desc: t('profile.accessibility'),
-      path: '/settings', 
-      icon: Settings,
-      color: 'bg-slate-500',
     },
   ];
 

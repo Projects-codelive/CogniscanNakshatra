@@ -39,7 +39,7 @@ const Dashboard = () => {
   const { isOnline, isOfflineMode, getQueueStats } = useSyncStore();
   const patientName = user?.name || user?.email?.split('@')[0] || 'User';
   
-  const [cogniScore, setCogniScore] = useState(0);
+  const [cogniScore, setCogniScore] = useState(storeScore || 0);
   const [scoreBreakdown, setScoreBreakdown] = useState(null);
   const [recentActivities, setRecentActivities] = useState([]);
   const [weeklyData, setWeeklyData] = useState([]);
@@ -124,7 +124,8 @@ const Dashboard = () => {
         medicationLogs,
       });
 
-      const effectiveScore = scores.overall !== null ? (risk?.weightedScore || scores.overall) : 0;
+      const effectiveScore = risk?.weightedScore || scores.overall || storeScore || 0;
+
       setCogniScore(effectiveScore);
       setScoreBreakdown(scores.breakdown);
 
