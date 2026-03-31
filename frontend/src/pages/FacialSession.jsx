@@ -162,7 +162,17 @@ const FacialSession = () => {
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play().catch(console.error);
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+        
+        const playPromise = videoRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(err => {
+            if (err.name !== 'AbortError') {
+              console.log('Video play error:', err);
+            }
+          });
+        }
       }
       
       setCameraError(null);
@@ -207,9 +217,24 @@ const FacialSession = () => {
     setCalibrationSteps({ position: false, expression: false, blink: false, complete: false });
     setCalibrationFrames([]);
     
+    if (videoRef.current && videoRef.current.readyState < 2) {
+      videoRef.current.onloadeddata = () => {
+        setTimeout(() => startCalibrationTimer(), 500);
+      };
+      return;
+    }
+    
+    startCalibrationTimer();
+  };
+
+  const startCalibrationTimer = () => {
     let elapsed = 0;
-    const duration = 5000;
+    const duration = 3000;
     const interval = 100;
+    
+    if (calibrationIntervalRef.current) {
+      clearInterval(calibrationIntervalRef.current);
+    }
     
     calibrationIntervalRef.current = setInterval(() => {
       elapsed += interval;
@@ -256,31 +281,37 @@ const FacialSession = () => {
   const completeCalibration = async () => {
     setCalibrationSteps(prev => ({ ...prev, complete: true }));
     
+    const mockBaseline = {
+      neutral_expression: { neutral: 0.7, happy: 0.15, sad: 0.05, surprised: 0.1 },
+      blink_rate_per_minute: 15,
+      baseline_gaze: 'center',
+      baseline_head_position: { pitch: 0, yaw: 0, roll: 0 }
+    };
+    
+    setCalibrationBaseline(mockBaseline);
+    sessionDataRef.current.calibration_baseline = mockBaseline;
+    
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/facial/calibrate`, {
-        frames: calibrationFrames,
-        patient_id: patientId
-      });
+      const response = await Promise.race([
+        axios.post(`${API_BASE_URL}/api/facial/calibrate`, {
+          frames: calibrationFrames,
+          patient_id: patientId
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
+      ]);
       
-      setCalibrationBaseline(response.data);
-      sessionDataRef.current.calibration_baseline = response.data;
-      
+      if (response && response.data) {
+        setCalibrationBaseline(response.data);
+        sessionDataRef.current.calibration_baseline = response.data;
+      }
     } catch (error) {
-      console.error('Calibration API error:', error);
-      const mockBaseline = {
-        neutral_expression: { neutral: 0.7, happy: 0.15, sad: 0.05, surprised: 0.1 },
-        blink_rate_per_minute: 15,
-        baseline_gaze: 'center',
-        baseline_head_position: { pitch: 0, yaw: 0, roll: 0 }
-      };
-      setCalibrationBaseline(mockBaseline);
-      sessionDataRef.current.calibration_baseline = mockBaseline;
+      console.log('Using mock calibration baseline (API unavailable or timeout)');
     }
     
     setTimeout(() => {
       setSessionPhase('ready');
       initializeSession();
-    }, 1000);
+    }, 500);
   };
 
   const initializeSession = () => {
