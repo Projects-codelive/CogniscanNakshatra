@@ -23,7 +23,8 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
 
 const EMOTION_COLORS = {
   happy: '#22c55e', neutral: '#6b7280', sad: '#3b82f6',

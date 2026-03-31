@@ -23,7 +23,8 @@ import ResultAnalysisPanel from '../components/ResultAnalysisPanel';
 import { getLastSpeechSession, addSpeechSession, getSpeechSessions } from '../store/db';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api/speech';
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/api/speech`;
+
 
 const SpeechSession = () => {
   const [sessionStatus, setSessionStatus] = useState('idle');
