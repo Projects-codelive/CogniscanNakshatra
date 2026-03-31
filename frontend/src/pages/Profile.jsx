@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useAuthStore from '../store/useAuthStore';
-import { User, Download, LogOut, Eye, Type, Lock, Globe, KeyRound, Fingerprint, Trash2, RefreshCw, Loader2, Check, X, Pencil, Shield, Mail, LockKeyhole, Share2, Copy, ExternalLink, Users, Link2, Info } from 'lucide-react';
+import { useAppStore } from '../store/useAppStore';
+import { User, Download, LogOut, Eye, Type, Lock, Globe, KeyRound, Fingerprint, Trash2, RefreshCw, Loader2, Check, X, Pencil, Shield, Mail, LockKeyhole, Share2, Copy, ExternalLink, Users, Link2, Info, AlertTriangle } from 'lucide-react';
 import { getTestResults, getCheckIns } from '../store/db';
 import LanguageSelector from '../components/LanguageSelector';
 import { createPasskey, deletePasskey, hasPasskey, isPasskeySupported } from '../utils/passkey';
@@ -38,6 +39,7 @@ export default function Profile() {
   const [copied, setCopied] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [linkedCaregivers, setLinkedCaregivers] = useState([]);
+  const [showResetModal, setShowResetModal] = useState(false);
 
   const loadData = useCallback(async () => {
     const tests = await getTestResults(100);
@@ -267,6 +269,64 @@ export default function Profile() {
     window.open('/caregiver/login', '_blank');
   };
 
+  const handleResetData = async () => {
+    if (!user?.email) return;
+    setIsProcessing(true);
+    
+    await new Promise(r => setTimeout(r, 500));
+    
+    try {
+      const db = window.indexedDB ? window.indexedDB.open('nakshatra-db', 1) : null;
+      if (db) {
+        db.onsuccess = () => {
+          const database = db.result;
+          const stores = ['testResults', 'checkIns', 'speechSessions', 'facialSessions', 'medicationLogs'];
+          stores.forEach(storeName => {
+            if (database.objectStoreNames.contains(storeName)) {
+              const transaction = database.transaction([storeName], 'readwrite');
+              const store = transaction.objectStore(storeName);
+              store.clear();
+            }
+          });
+        };
+      }
+      
+      const storedUser = localStorage.getItem(`nakshatra-user-${user.email}`);
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        delete userData.cogniScore;
+        delete userData.streak;
+        delete userData.testResults;
+        delete userData.checkIns;
+        delete userData.speechSessions;
+        delete userData.facialSessions;
+        delete userData.shareCode;
+        delete userData.linkedCaregivers;
+        userData.cogniScore = 0;
+        userData.streak = 0;
+        localStorage.setItem(`nakshatra-user-${user.email}`, JSON.stringify(userData));
+      }
+      
+      const { setCogniScore, setStreak } = useAppStore.getState();
+      setCogniScore(0);
+      setStreak(0);
+      
+      setTestResults([]);
+      setCheckIns([]);
+      setShareCode('');
+      setLinkedCaregivers([]);
+      
+      setShowResetModal(false);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 2000);
+    } catch (error) {
+      console.error('Error resetting data:', error);
+      setError(t('profile.errors.resetFailed'));
+    }
+    
+    setIsProcessing(false);
+  };
+
   const tabs = [
     { id: 'profile', label: t('profile.profileTab'), icon: User },
     { id: 'security', label: t('profile.securityTab'), icon: Shield },
@@ -482,6 +542,23 @@ export default function Profile() {
                   <Lock className="w-4 h-4 text-slate-600 shrink-0 mt-0.5" />
                   <p className="text-xs text-slate-600">{t('profile.dataStoredLocally')}</p>
                 </div>
+              </div>
+
+              <div className="bg-slate-900 rounded-2xl p-4 lg:p-5 border border-slate-800">
+                <div className="flex items-center gap-2 mb-4">
+                  <Trash2 className="w-5 h-5 text-red-400" />
+                  <p className="font-semibold text-white">{t('profile.resetData')}</p>
+                </div>
+                <button
+                  onClick={() => setShowResetModal(true)}
+                  className="w-full flex items-center gap-3 py-2 hover:bg-red-500/10 text-red-400 rounded-xl px-2 -mx-2 transition-colors"
+                >
+                  <Trash2 className="w-5 h-5" />
+                  <div className="text-left">
+                    <p className="font-medium text-sm">{t('profile.resetAllData')}</p>
+                    <p className="text-xs text-slate-500">{t('profile.resetAllDataDesc')}</p>
+                  </div>
+                </button>
               </div>
             </>
           )}
@@ -742,6 +819,73 @@ export default function Profile() {
                   ) : (
                     t('profile.saveChanges')
                   )}
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {showResetModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-end lg:items-center justify-center p-4 z-50">
+          <div className="bg-slate-900 rounded-t-2xl lg:rounded-2xl p-6 max-w-sm w-full border border-slate-800 shadow-2xl">
+            {success ? (
+              <div className="text-center py-4">
+                <div className="w-14 h-14 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Check className="w-7 h-7 text-green-400" />
+                </div>
+                <h2 className="text-lg font-bold text-white">{t('profile.resetSuccess')}</h2>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-bold text-white">{t('profile.resetData')}</h2>
+                  <button
+                    onClick={() => setShowResetModal(false)}
+                    className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center hover:bg-slate-700"
+                  >
+                    <X className="w-4 h-4 text-slate-400" />
+                  </button>
+                </div>
+
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-4">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="text-red-400 font-medium mb-1">{t('profile.resetWarning')}</p>
+                      <p className="text-slate-400">{t('profile.resetWarningDesc')}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between py-2 px-3 bg-slate-800/50 rounded-lg">
+                    <span className="text-sm text-slate-400">{t('profile.testResults')}</span>
+                    <span className="text-sm text-white font-medium">{testResults.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2 px-3 bg-slate-800/50 rounded-lg">
+                    <span className="text-sm text-slate-400">{t('profile.checkIns')}</span>
+                    <span className="text-sm text-white font-medium">{checkIns.length}</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleResetData}
+                  disabled={isProcessing}
+                  className="w-full h-12 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-50"
+                >
+                  {isProcessing ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    t('profile.resetConfirm')
+                  )}
+                </button>
+
+                <button
+                  onClick={() => setShowResetModal(false)}
+                  className="w-full h-12 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-medium transition-all flex items-center justify-center gap-2 mt-2"
+                >
+                  {t('profile.cancel')}
                 </button>
               </>
             )}

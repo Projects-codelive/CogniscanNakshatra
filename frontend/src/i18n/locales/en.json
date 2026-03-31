@@ -180,6 +180,15 @@
     "nameUpdated": "Name Updated!",
     "emailUpdated": "Email Updated!",
     "passwordChanged": "Password Changed!",
+    "resetData": "Reset Data",
+    "resetAllData": "Reset All Data",
+    "resetAllDataDesc": "Clear all scores and metrics",
+    "resetWarning": "This action cannot be undone",
+    "resetWarningDesc": "All your test results, check-ins, and scores will be permanently deleted.",
+    "resetConfirm": "Reset Everything",
+    "resetSuccess": "All data has been reset!",
+    "testResults": "Test Results",
+    "checkIns": "Check-ins",
     "errors": {
       "nameMinChars": "Name must be at least 2 characters",
       "emailRequired": "Email is required",
@@ -187,7 +196,8 @@
       "emailExists": "An account with this email already exists",
       "passwordMinChars": "Password must be at least 6 characters",
       "passwordsMismatch": "Passwords do not match",
-      "passkeyFailed": "Failed to create passkey. Please try again."
+      "passkeyFailed": "Failed to create passkey. Please try again.",
+      "resetFailed": "Failed to reset data. Please try again."
     }
   },
   "medications": {
